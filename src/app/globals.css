@@ -1,15 +1,20 @@
 @import "tailwindcss";
 
+/*
+ * Two themes, switched by <html data-theme="light|dark"> (see ThemeProvider).
+ * Dark  = Mono + Lime. Light = Paper & Ink.
+ * Keep in sync with PALETTES in src/lib/theme.ts (used by canvas/3D code).
+ */
 @theme {
-  --color-board: #0a0f0d;
-  --color-surface: #111916;
-  --color-surface-2: #16211d;
-  --color-line: #22302a;
-  --color-warm: #f0b35a;
-  --color-warm-bright: #f6c77f;
-  --color-signal: #3df5c4;
-  --color-muted: #8a9a93;
-  --color-ink: #e6ede9;
+  --color-canvas: #0b0b0b;
+  --color-surface: #151515;
+  --color-surface-2: #1c1c1c;
+  --color-line: #262626;
+  --color-ink: #f5f5f5;
+  --color-muted: #8a8a8a;
+  --color-accent: #c6f432;
+  --color-on-accent: #0b0b0b;
+  --color-second: #d4d4d4;
 
   --animate-blink: blink 1.2s steps(2, start) infinite;
 
@@ -27,33 +32,66 @@
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
-:root {
+:root,
+[data-theme="dark"] {
   color-scheme: dark;
+  --color-canvas: #0b0b0b;
+  --color-surface: #151515;
+  --color-surface-2: #1c1c1c;
+  --color-line: #262626;
+  --color-ink: #f5f5f5;
+  --color-muted: #8a8a8a;
+  --color-accent: #c6f432;
+  --color-on-accent: #0b0b0b;
+  --color-second: #d4d4d4;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --color-canvas: #f4f1ea;
+  --color-surface: #fffdf8;
+  --color-surface-2: #ece7dc;
+  --color-line: #dcd5c7;
+  --color-ink: #161616;
+  --color-muted: #6b6760;
+  --color-accent: #bf4320;
+  --color-on-accent: #fffdf8;
+  --color-second: #2f5d50;
+}
+
+/* Project category colours: full-stack = accent, security = ink, IoT = muted (lower priority). */
+:root {
+  --cat-web: var(--color-accent);
+  --cat-security: var(--color-ink);
+  --cat-iot: var(--color-muted);
 }
 
 html {
-  background: var(--color-board);
+  background: var(--color-canvas);
 }
 
 body {
-  background-color: var(--color-board);
+  background-color: var(--color-canvas);
   /* subtle editor-style line grid */
   background-image:
-    linear-gradient(rgb(138 154 147 / 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(138 154 147 / 0.05) 1px, transparent 1px);
+    linear-gradient(color-mix(in srgb, var(--color-line) 45%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--color-line) 45%, transparent) 1px, transparent 1px);
   background-size: 48px 48px;
   color: var(--color-ink);
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 ::selection {
-  background: rgb(61 245 196 / 0.3);
-  color: var(--color-ink);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
 }
 
 @layer base {
   :focus-visible {
-    outline: 2px solid var(--color-signal);
+    outline: 2px solid var(--color-accent);
     outline-offset: 3px;
   }
 }
@@ -70,16 +108,36 @@ html.lenis body {
   overscroll-behavior: contain;
 }
 
-/* Custom cursor: hide the native one only where the ring is active */
-html.has-custom-cursor,
-html.has-custom-cursor a,
-html.has-custom-cursor button,
-html.has-custom-cursor [role="button"] {
-  cursor: none;
+/*
+ * Cursors: drawn system cursors (CSS, no JS) so text selection, dragging and the I-beam stay native.
+ * Default = wedge, links/buttons = accent wedge, text = serif I-beam. Generated per theme.
+ */
+:root,
+[data-theme="dark"] {
+  --cursor-default: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2222%22 height=%2222%22 viewBox=%220 0 22 22%22%3E%3Cpath d=%22M3 3L19 9.5L11.5 11.5L9.5 19Z%22 fill=%22%23F5F5F5%22 stroke=%22%230B0B0B%22 stroke-width=%221.5%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E") 3 3, auto;
+  --cursor-pointer: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2222%22 height=%2222%22 viewBox=%220 0 22 22%22%3E%3Cpath d=%22M3 3L19 9.5L11.5 11.5L9.5 19Z%22 fill=%22%23C6F432%22 stroke=%22%230B0B0B%22 stroke-width=%221.5%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E") 3 3, pointer;
+  --cursor-text: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2222%22 viewBox=%220 0 14 22%22 fill=%22none%22 stroke-linecap=%22round%22%3E%3Cpath d=%22M3 2.5Q7 2.5 7 5Q7 2.5 11 2.5M7 5V17M3 19.5Q7 19.5 7 17Q7 19.5 11 19.5%22 stroke=%22%230B0B0B%22 stroke-width=%224%22/%3E%3Cpath d=%22M3 2.5Q7 2.5 7 5Q7 2.5 11 2.5M7 5V17M3 19.5Q7 19.5 7 17Q7 19.5 11 19.5%22 stroke=%22%23F5F5F5%22 stroke-width=%221.7%22/%3E%3C/svg%3E") 7 11, text;
 }
-html.has-custom-cursor input,
-html.has-custom-cursor textarea {
-  cursor: text;
+
+[data-theme="light"] {
+  --cursor-default: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2222%22 height=%2222%22 viewBox=%220 0 22 22%22%3E%3Cpath d=%22M3 3L19 9.5L11.5 11.5L9.5 19Z%22 fill=%22%23161616%22 stroke=%22%23FFFDF8%22 stroke-width=%221.5%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E") 3 3, auto;
+  --cursor-pointer: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2222%22 height=%2222%22 viewBox=%220 0 22 22%22%3E%3Cpath d=%22M3 3L19 9.5L11.5 11.5L9.5 19Z%22 fill=%22%23BF4320%22 stroke=%22%23FFFDF8%22 stroke-width=%221.5%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E") 3 3, pointer;
+  --cursor-text: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2222%22 viewBox=%220 0 14 22%22 fill=%22none%22 stroke-linecap=%22round%22%3E%3Cpath d=%22M3 2.5Q7 2.5 7 5Q7 2.5 11 2.5M7 5V17M3 19.5Q7 19.5 7 17Q7 19.5 11 19.5%22 stroke=%22%23FFFDF8%22 stroke-width=%224%22/%3E%3Cpath d=%22M3 2.5Q7 2.5 7 5Q7 2.5 11 2.5M7 5V17M3 19.5Q7 19.5 7 17Q7 19.5 11 19.5%22 stroke=%22%23161616%22 stroke-width=%221.7%22/%3E%3C/svg%3E") 7 11, text;
+}
+
+html {
+  cursor: var(--cursor-default);
+}
+:where(p, h1, h2, h3, h4, h5, h6, li, dd, dt, blockquote, figcaption, pre, code, kbd, td, th, span, em, strong, time),
+:where(input:not([type="checkbox"], [type="radio"], [type="submit"], [type="button"]), textarea, [contenteditable="true"]) {
+  cursor: var(--cursor-text);
+}
+:where(a, button, [role="button"], select, summary, label[for], [tabindex="0"]),
+:where(a, button, [role="button"], summary) * {
+  cursor: var(--cursor-pointer);
+}
+:where(button:disabled, button:disabled *) {
+  cursor: not-allowed;
 }
 
 .label-mono {

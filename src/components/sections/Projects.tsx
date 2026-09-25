@@ -29,7 +29,7 @@ function slugFromHash(): string | null {
 
 export default function Projects() {
   const [filter, setFilter] = useState<Filter>("all");
-  // Deep link: /work#project-<slug> opens that project's modal.
+  // Deep link: /#project-<slug> opens that project's modal.
   const [openSlug, setOpenSlug] = useState<string | null>(() => slugFromHash());
   const reduced = useReducedMotion();
 
@@ -69,18 +69,18 @@ export default function Projects() {
               aria-pressed={active}
               onClick={() => setFilter(f.id)}
               className={`relative rounded-md border px-3.5 py-2 font-mono text-xs transition-colors ${
-                active ? "border-signal/60 text-board" : "border-line text-muted hover:border-warm/60 hover:text-ink"
+                active ? "border-ink text-canvas" : "border-line text-muted hover:border-second/60 hover:text-ink"
               }`}
             >
               {active && (
                 <motion.span
                   layoutId="filter-pill"
-                  className="absolute inset-0 -z-0 rounded-[5px] bg-signal"
+                  className="absolute inset-0 -z-0 rounded-[5px] bg-ink"
                   transition={{ duration: reduced ? 0 : 0.3, ease: [0.2, 0.8, 0.2, 1] }}
                 />
               )}
               <span className="relative">
-                {f.label} <span className={active ? "text-board/70" : "text-muted/70"}>({f.count})</span>
+                {f.label} <span className={active ? "text-canvas/70" : "text-muted/70"}>({f.count})</span>
               </span>
             </button>
           );
@@ -130,14 +130,14 @@ function ProjectDetail({ project: p, onClose }: { project: Project; onClose: () 
           <h3 id="project-modal-title" className="mt-1 font-display text-2xl font-semibold text-ink md:text-3xl">
             {p.title}
           </h3>
-          {p.status && <p className="mt-1 font-mono text-xs text-warm">{p.status}</p>}
+          {p.status && <p className="mt-1 font-mono text-xs text-second">{p.status}</p>}
         </div>
         <button
           type="button"
           onClick={onClose}
           data-autofocus
           aria-label={projectLabels.close}
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-md border border-line font-mono text-muted transition-colors hover:border-signal/60 hover:text-ink"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-md border border-line font-mono text-muted transition-colors hover:border-accent/60 hover:text-ink"
         >
           ✕
         </button>
@@ -171,7 +171,7 @@ function ProjectDetail({ project: p, onClose }: { project: Project; onClose: () 
         <DetailBlock label={projectLabels.numbers}>
           <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {p.metrics.map((m) => (
-              <div key={m.label} className="flex flex-col-reverse rounded-lg border border-line bg-board/60 p-3">
+              <div key={m.label} className="flex flex-col-reverse rounded-lg border border-line bg-canvas/60 p-3">
                 <dt className="mt-1 text-xs text-muted">{m.label}</dt>
                 <dd className="font-mono text-xl font-semibold" style={{ color: cat.color }}>
                   {m.value}
@@ -186,7 +186,7 @@ function ProjectDetail({ project: p, onClose }: { project: Project; onClose: () 
         <DetailBlock label={projectLabels.stack}>
           <div className="flex flex-wrap gap-1.5">
             {p.stack.map((t) => (
-              <Chip key={t} tone={p.category === "iot" ? "warm" : "signal"}>
+              <Chip key={t} tone={p.category === "iot" ? "second" : "accent"}>
                 {t}
               </Chip>
             ))}
@@ -201,7 +201,7 @@ function ProjectDetail({ project: p, onClose }: { project: Project; onClose: () 
                 href={l.href}
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-md border border-signal/60 px-4 py-2 font-mono text-sm text-signal transition-colors hover:bg-signal/10"
+                className="rounded-md border border-accent/60 px-4 py-2 font-mono text-sm text-accent transition-colors hover:bg-accent/10"
               >
                 {l.label} ↗
               </a>
@@ -221,7 +221,7 @@ function ProjectDetail({ project: p, onClose }: { project: Project; onClose: () 
 function DetailBlock({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <section>
-      <h4 className="label-mono mb-3 text-[11px] text-warm">{label}</h4>
+      <h4 className="label-mono mb-3 text-[11px] text-second">{label}</h4>
       {children}
     </section>
   );

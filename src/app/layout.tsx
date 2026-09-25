@@ -4,6 +4,7 @@ import { identity, nav, site } from "@/content";
 import Providers from "@/components/Providers";
 import Header from "@/components/ui/Header";
 import Footer from "@/components/ui/Footer";
+import { PALETTES, themeInitScript } from "@/lib/theme";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -55,20 +56,29 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0A0F0D",
-  colorScheme: "dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: PALETTES.light.canvas },
+    { media: "(prefers-color-scheme: dark)", color: PALETTES.dark.canvas },
+  ],
+  colorScheme: "dark light",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      data-theme="dark"
+      suppressHydrationWarning
       className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}
     >
+      <head>
+        {/* sets data-theme before first paint (stored choice or OS preference) — no theme flash */}
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="min-h-screen">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded focus:bg-signal focus:px-4 focus:py-2 focus:font-mono focus:text-board"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded focus:bg-accent focus:px-4 focus:py-2 focus:font-mono focus:text-on-accent"
         >
           {nav.skip}
         </a>

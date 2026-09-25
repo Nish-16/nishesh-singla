@@ -22,9 +22,9 @@ export default function SensorReadout({ fields, simLabel }: { fields: ReadoutFie
   }, [inView, reduced, fields]);
 
   return (
-    <div ref={ref} aria-hidden className="flex items-center gap-3 overflow-hidden rounded-md border border-warm/30 bg-board/70 px-3 py-2 font-mono text-[11px] text-warm-bright">
+    <div ref={ref} aria-hidden className="flex items-center gap-3 overflow-hidden rounded-md border border-second/30 bg-canvas/70 px-3 py-2 font-mono text-[11px] text-second">
       <span className="flex items-center gap-1.5 text-[10px] text-muted">
-        <span className="h-1.5 w-1.5 animate-blink rounded-full bg-signal" />
+        <span className="h-1.5 w-1.5 animate-blink rounded-full bg-accent" />
         {simLabel}
       </span>
       <span className="flex flex-wrap gap-x-3 gap-y-0.5 tabular-nums">

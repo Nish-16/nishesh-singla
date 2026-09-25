@@ -2,25 +2,22 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import * as THREE from "three";
 import { ARCH_EDGES, ARCH_NODES, NODE_H, NODE_W, bezier, edgeControlPoints, type ArchNode, type ArchNodeId } from "@/lib/arch";
-
-const BG = "#0A0F0D";
-const SIGNAL = "#3DF5C4";
-const WARM = "#F0B35A";
-const MUTED = "#8A9A93";
+import type { Palette } from "@/lib/theme";
 
 /** Shared, mutable scene state kept out of React (only one hero scene exists). */
 const state = { hovered: null as ArchNodeId | null };
 
 const touches = (edge: [ArchNodeId, ArchNodeId], id: ArchNodeId | null) => !!id && (edge[0] === id || edge[1] === id);
 
+const CURVES = ARCH_EDGES.map(([a, b]) => edgeControlPoints(a, b));
+
 // ---------------------------------------------------------------------------
 // Node card label (canvas texture, no font network requests)
 // ---------------------------------------------------------------------------
 
-function makeLabelTexture(node: ArchNode): THREE.CanvasTexture {
+function makeLabelTexture(node: ArchNode, p: Palette): THREE.CanvasTexture {
   const W = 512;
   const H = 200;
   const c = document.createElement("canvas");
@@ -34,15 +31,13 @@ function makeLabelTexture(node: ArchNode): THREE.CanvasTexture {
     const g = c.getContext("2d")!;
     const mono = getComputedStyle(document.documentElement).getPropertyValue("--font-jetbrains-mono").trim() || "monospace";
     g.clearRect(0, 0, W, H);
-    g.fillStyle = SIGNAL;
-    g.beginPath();
-    g.arc(44, 74, 11, 0, Math.PI * 2);
-    g.fill();
-    g.fillStyle = "#E6EDE9";
+    g.fillStyle = p.accent;
+    g.fillRect(34, 64, 20, 20);
+    g.fillStyle = p.ink;
     g.font = `700 60px ${mono}`;
     g.textBaseline = "middle";
     g.fillText(node.label, 74, 76);
-    g.fillStyle = MUTED;
+    g.fillStyle = p.muted;
     g.font = `500 32px ${mono}`;
     g.fillText(node.sub, 34, 142);
     tex.needsUpdate = true;
@@ -52,18 +47,20 @@ function makeLabelTexture(node: ArchNode): THREE.CanvasTexture {
   return tex;
 }
 
-function NodeCard({ node }: { node: ArchNode }) {
-  const label = useMemo(() => makeLabelTexture(node), [node]);
+function NodeCard({ node, palette }: { node: ArchNode; palette: Palette }) {
+  const label = useMemo(() => makeLabelTexture(node, palette), [node, palette]);
   const edges = useMemo(() => new THREE.EdgesGeometry(new THREE.BoxGeometry(NODE_W, NODE_H, 0.16)), []);
   const edgeMat = useRef<THREE.LineBasicMaterial>(null);
   const group = useRef<THREE.Group>(null);
-  const base = useMemo(() => new THREE.Color(SIGNAL).multiplyScalar(0.55), []);
-  const hot = useMemo(() => new THREE.Color(SIGNAL).multiplyScalar(2.6), []);
+  const base = useMemo(() => new THREE.Color(palette.lineStrong), [palette]);
+  const hot = useMemo(() => new THREE.Color(palette.accent), [palette]);
   const phase = node.pos[0] * 0.7 + node.pos[1];
+
+  useEffect(() => () => label.dispose(), [label]);
 
   useFrame(({ clock }, dt) => {
     const h = state.hovered;
-    const lit = h === node.id ? 1 : h && ARCH_EDGES.some((e) => touches(e, h) && touches(e, node.id)) ? 0.55 : 0;
+    const lit = h === node.id ? 1 : h && ARCH_EDGES.some((e) => touches(e, h) && touches(e, node.id)) ? 0.6 : 0;
     if (edgeMat.current) edgeMat.current.color.lerpColors(base, hot, lit);
     if (group.current) {
       const target = h === node.id ? 1.06 : 1;
@@ -79,19 +76,17 @@ function NodeCard({ node }: { node: ArchNode }) {
       onPointerOver={(e) => {
         e.stopPropagation();
         state.hovered = node.id;
-        document.body.style.cursor = "pointer";
       }}
       onPointerOut={() => {
         if (state.hovered === node.id) state.hovered = null;
-        document.body.style.cursor = "";
       }}
     >
       <mesh>
         <boxGeometry args={[NODE_W, NODE_H, 0.16]} />
-        <meshStandardMaterial color="#111916" roughness={0.55} metalness={0.2} />
+        <meshBasicMaterial color={palette.surface} />
       </mesh>
       <lineSegments geometry={edges}>
-        <lineBasicMaterial ref={edgeMat} color={base} toneMapped={false} />
+        <lineBasicMaterial ref={edgeMat} color={base} />
       </lineSegments>
       <mesh position={[0, 0, 0.081]}>
         <planeGeometry args={[NODE_W * 0.96, (NODE_W * 0.96 * 200) / 512]} />
@@ -105,24 +100,24 @@ function NodeCard({ node }: { node: ArchNode }) {
 // Wires + packets
 // ---------------------------------------------------------------------------
 
-const CURVES = ARCH_EDGES.map(([a, b]) => edgeControlPoints(a, b));
-
-function Wires() {
-  const lines = useMemo(
-    () =>
-      CURVES.map((cp) => {
-        const geo = new THREE.BufferGeometry().setFromPoints(Array.from({ length: 48 }, (_, i) => new THREE.Vector3(...bezier(cp, i / 47))));
-        const mat = new THREE.LineBasicMaterial({ color: SIGNAL, transparent: true, opacity: 0.4, toneMapped: false });
-        return new THREE.Line(geo, mat);
-      }),
+function Wires({ palette }: { palette: Palette }) {
+  const geometries = useMemo(
+    () => CURVES.map((cp) => new THREE.BufferGeometry().setFromPoints(Array.from({ length: 48 }, (_, i) => new THREE.Vector3(...bezier(cp, i / 47))))),
     [],
   );
+  const lines = useMemo(
+    () => geometries.map((geo) => new THREE.Line(geo, new THREE.LineBasicMaterial({ color: palette.muted, transparent: true, opacity: 0.7 }))),
+    [geometries, palette],
+  );
+  const muted = useMemo(() => new THREE.Color(palette.muted), [palette]);
+  const accent = useMemo(() => new THREE.Color(palette.accent), [palette]);
 
   useFrame(() => {
     ARCH_EDGES.forEach((e, i) => {
       const m = lines[i].material as THREE.LineBasicMaterial;
-      const target = state.hovered ? (touches(e, state.hovered) ? 0.95 : 0.12) : 0.4;
-      m.opacity = THREE.MathUtils.lerp(m.opacity, target, 0.15);
+      const on = touches(e, state.hovered);
+      m.color.copy(on ? accent : muted);
+      m.opacity = THREE.MathUtils.lerp(m.opacity, state.hovered ? (on ? 1 : 0.25) : 0.7, 0.15);
     });
   });
 
@@ -131,12 +126,12 @@ function Wires() {
       {lines.map((l, i) => (
         <primitive key={i} object={l} />
       ))}
-      <Ports />
+      <Ports palette={palette} />
     </group>
   );
 }
 
-function Ports() {
+function Ports({ palette }: { palette: Palette }) {
   const ref = useRef<THREE.InstancedMesh>(null);
   useEffect(() => {
     const m = new THREE.Matrix4();
@@ -148,16 +143,15 @@ function Ports() {
   }, []);
   return (
     <instancedMesh ref={ref} args={[undefined, undefined, CURVES.length * 2]}>
-      <sphereGeometry args={[0.055, 10, 8]} />
-      <meshBasicMaterial color={new THREE.Color(SIGNAL).multiplyScalar(1.4)} toneMapped={false} />
+      <sphereGeometry args={[0.05, 10, 8]} />
+      <meshBasicMaterial color={palette.ink} />
     </instancedMesh>
   );
 }
 
 const REQ_PER_EDGE = 2;
-const TAIL = 3;
 
-function Packets() {
+function Packets({ palette }: { palette: Palette }) {
   const req = useRef<THREE.InstancedMesh>(null);
   const res = useRef<THREE.InstancedMesh>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
@@ -170,17 +164,13 @@ function Packets() {
       const boost = touches(e, state.hovered) ? 2.6 : state.hovered ? 0.6 : 1;
       clocks.current[i] = (clocks.current[i] + d * 0.32 * boost) % 1;
       const t0 = clocks.current[i];
-      // requests travel forward with a short tail
+      // requests travel forward
       for (let p = 0; p < REQ_PER_EDGE; p++) {
-        const head = (t0 + p / REQ_PER_EDGE) % 1;
-        for (let k = 0; k < TAIL; k++) {
-          const t = head - k * 0.025;
-          const s = t < 0 ? 0 : Math.min(1, t * 10, (1 - t) * 10) * (1 - k / TAIL);
-          dummy.position.set(...bezier(CURVES[i], Math.max(0, t)));
-          dummy.scale.setScalar(Math.max(s, 0.0001));
-          dummy.updateMatrix();
-          req.current!.setMatrixAt(ri++, dummy.matrix);
-        }
+        const t = (t0 + p / REQ_PER_EDGE) % 1;
+        dummy.position.set(...bezier(CURVES[i], t));
+        dummy.scale.setScalar(Math.max(Math.min(1, t * 10, (1 - t) * 10), 0.0001));
+        dummy.updateMatrix();
+        req.current!.setMatrixAt(ri++, dummy.matrix);
       }
       // one response travels back
       const back = 1 - ((t0 + 0.25) % 1);
@@ -195,28 +185,29 @@ function Packets() {
 
   return (
     <>
-      <instancedMesh ref={req} args={[undefined, undefined, ARCH_EDGES.length * REQ_PER_EDGE * TAIL]} frustumCulled={false}>
-        <sphereGeometry args={[0.07, 10, 8]} />
-        <meshBasicMaterial color={new THREE.Color(SIGNAL).multiplyScalar(3)} toneMapped={false} />
+      <instancedMesh ref={req} args={[undefined, undefined, ARCH_EDGES.length * REQ_PER_EDGE]} frustumCulled={false}>
+        <boxGeometry args={[0.13, 0.13, 0.13]} />
+        <meshBasicMaterial color={palette.accent} />
       </instancedMesh>
       <instancedMesh ref={res} args={[undefined, undefined, ARCH_EDGES.length]} frustumCulled={false}>
-        <sphereGeometry args={[0.06, 10, 8]} />
-        <meshBasicMaterial color={new THREE.Color(WARM).multiplyScalar(2.4)} toneMapped={false} />
+        <boxGeometry args={[0.1, 0.1, 0.1]} />
+        <meshBasicMaterial color={palette.ink} />
       </instancedMesh>
     </>
   );
 }
 
-function Backdrop() {
+function Backdrop({ palette }: { palette: Palette }) {
   const grid = useMemo(() => {
-    const g = new THREE.GridHelper(60, 60, SIGNAL, SIGNAL);
+    const g = new THREE.GridHelper(60, 60, palette.line, palette.line);
     const m = g.material as THREE.Material;
     m.transparent = true;
-    m.opacity = 0.05;
+    m.opacity = 0.55;
     g.rotation.x = Math.PI / 2;
     g.position.z = -3;
     return g;
-  }, []);
+  }, [palette]);
+  useEffect(() => () => grid.dispose(), [grid]);
   return <primitive object={grid} />;
 }
 
@@ -276,11 +267,10 @@ function Rig({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function HeroScene({ active }: { active: boolean }) {
+export default function HeroScene({ active, palette }: { active: boolean; palette: Palette }) {
   useEffect(
     () => () => {
       state.hovered = null;
-      document.body.style.cursor = "";
     },
     [],
   );
@@ -288,25 +278,21 @@ export default function HeroScene({ active }: { active: boolean }) {
     <Canvas
       dpr={[1, 1.5]}
       frameloop={active ? "always" : "never"}
+      flat
       camera={{ position: [0, 0.6, 11.5], fov: 40, near: 0.1, far: 80 }}
-      gl={{ antialias: false, powerPreference: "high-performance" }}
+      gl={{ antialias: true, powerPreference: "high-performance" }}
       aria-hidden
     >
-      <color attach="background" args={[BG]} />
-      <fog attach="fog" args={[BG, 12, 26]} />
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[3, 5, 8]} intensity={1} />
-      <Backdrop />
+      <color attach="background" args={[palette.canvas]} />
+      <fog attach="fog" args={[palette.canvas, 12, 26]} />
+      <Backdrop palette={palette} />
       <Rig>
         {ARCH_NODES.map((n) => (
-          <NodeCard key={n.id} node={n} />
+          <NodeCard key={n.id} node={n} palette={palette} />
         ))}
-        <Wires />
-        <Packets />
+        <Wires palette={palette} />
+        <Packets palette={palette} />
       </Rig>
-      <EffectComposer multisampling={4}>
-        <Bloom mipmapBlur intensity={0.8} luminanceThreshold={0.85} luminanceSmoothing={0.2} />
-      </EffectComposer>
     </Canvas>
   );
 }

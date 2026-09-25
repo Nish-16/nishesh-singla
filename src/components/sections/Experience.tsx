@@ -23,10 +23,10 @@ export default function Experience() {
               <span
                 aria-hidden
                 className={`absolute -left-[31px] top-6 h-3 w-3 rotate-45 border transition-colors md:-left-[47px] ${
-                  isOpen ? "border-signal bg-signal shadow-[0_0_12px_#3DF5C4]" : "border-warm bg-board"
+                  isOpen ? "border-accent bg-accent" : "border-second bg-canvas"
                 }`}
               />
-              <div className={`rounded-xl border bg-surface transition-colors ${isOpen ? "border-signal/40" : "border-line hover:border-warm/50"}`}>
+              <div className={`rounded-xl border bg-surface transition-colors ${isOpen ? "border-accent/40" : "border-line hover:border-second/50"}`}>
                 <h3>
                   <button
                     type="button"
@@ -38,16 +38,16 @@ export default function Experience() {
                     <span>
                       <span className="block font-display text-xl font-semibold text-ink">
                         {role.title}
-                        <span className="text-warm"> · {role.org}</span>
+                        <span className="text-second"> · {role.org}</span>
                       </span>
                       <span className="mt-1 block font-mono text-xs text-muted">
                         {role.period} · {role.location}
-                        {role.kind === "leadership" && <span className="ml-2 text-warm">[{experienceLabels.leadership}]</span>}
+                        {role.kind === "leadership" && <span className="ml-2 text-second">[{experienceLabels.leadership}]</span>}
                       </span>
                     </span>
                     <span className="label-mono flex shrink-0 items-center gap-2 text-[11px] text-muted">
                       {isOpen ? experienceLabels.collapse : experienceLabels.expand}
-                      <span aria-hidden className={`inline-block transition-transform ${isOpen ? "rotate-45 text-signal" : ""}`}>
+                      <span aria-hidden className={`inline-block transition-transform ${isOpen ? "rotate-45 text-accent" : ""}`}>
                         +
                       </span>
                     </span>
@@ -71,7 +71,7 @@ export default function Experience() {
                       <ul className="space-y-2.5 border-t border-line px-5 py-5 text-ink/85 md:px-6">
                         {role.bullets.map((b) => (
                           <li key={b} className="flex gap-3">
-                            <span aria-hidden className="mt-2.5 h-1 w-3 shrink-0 bg-warm" />
+                            <span aria-hidden className="mt-2.5 h-1 w-3 shrink-0 bg-second" />
                             <span>{b}</span>
                           </li>
                         ))}

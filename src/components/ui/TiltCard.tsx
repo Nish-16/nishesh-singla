@@ -40,13 +40,13 @@ export default function TiltCard({
         onPointerMove={onMove}
         onPointerLeave={reset}
         style={{ "--glow": glow } as CSSProperties}
-        className={`group relative h-full rounded-xl border border-line bg-surface transition-[transform,border-color,box-shadow] duration-300 ease-out [transform:rotateX(var(--rx,0deg))_rotateY(var(--ry,0deg))] [transform-style:preserve-3d] hover:border-[color:var(--glow)] hover:shadow-[0_0_0_1px_var(--glow),0_0_36px_-6px_var(--glow)] focus-within:border-[color:var(--glow)] ${className}`}
+        className={`group relative h-full rounded-xl border border-line bg-surface transition-[transform,border-color,box-shadow] duration-300 ease-out [transform:rotateX(var(--rx,0deg))_rotateY(var(--ry,0deg))] [transform-style:preserve-3d] hover:border-[color:var(--glow)] focus-within:border-[color:var(--glow)] ${className}`}
       >
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
           style={{
-            background: "radial-gradient(420px circle at var(--gx,50%) var(--gy,50%), color-mix(in srgb, var(--glow) 12%, transparent), transparent 60%)",
+            background: "radial-gradient(420px circle at var(--gx,50%) var(--gy,50%), color-mix(in srgb, var(--glow) 6%, transparent), transparent 60%)",
           }}
         />
         {children}

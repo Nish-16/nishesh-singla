@@ -8,10 +8,6 @@ export function setLenis(instance: Lenis | null) {
   lenis = instance;
 }
 
-export function getLenis(): Lenis | null {
-  return lenis;
-}
-
 export function scrollToTarget(target: string | HTMLElement) {
   if (lenis) {
     lenis.scrollTo(target, { offset: -80 });

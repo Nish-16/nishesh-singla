@@ -16,29 +16,29 @@ export default function About() {
         {/* profile.json card */}
         <aside aria-label={about.profileFile} className="overflow-hidden rounded-xl border border-line bg-surface font-mono text-sm">
           <div className="flex items-center gap-2 border-b border-line bg-surface-2/60 px-4 py-2.5">
-            <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-warm/80" />
+            <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-second/80" />
             <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-muted/50" />
-            <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-signal/80" />
+            <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-accent/80" />
             <span className="ml-2 text-xs text-muted">{about.profileFile}</span>
           </div>
           <div className="px-5 py-4 leading-7">
             <span aria-hidden className="text-muted">{"{"}</span>
             <dl className="pl-5">
               <Row k="name">
-                <span className="text-warm-bright">&quot;{identity.name}&quot;</span>
+                <span className="text-second">&quot;{identity.name}&quot;</span>
               </Row>
               <Row k="role">
-                <span className="text-warm-bright">&quot;{about.profileRole}&quot;</span>
+                <span className="text-second">&quot;{about.profileRole}&quot;</span>
               </Row>
               {about.stats.map((s) => (
                 <Row key={s.key} k={s.key} note={s.note}>
-                  <span className="text-signal">
+                  <span className="text-accent">
                     <CountUp value={s.value} decimals={s.decimals} prefix={s.prefix} suffix={s.suffix} />
                   </span>
                 </Row>
               ))}
               <Row k="location" last>
-                <span className="text-warm-bright">&quot;{identity.location}&quot;</span>
+                <span className="text-second">&quot;{identity.location}&quot;</span>
               </Row>
             </dl>
             <span aria-hidden className="text-muted">{"}"}</span>

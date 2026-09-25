@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/lib/hooks";
+import { useTheme } from "@/components/ThemeProvider";
+import { withAlpha } from "@/lib/theme";
 
 const N = 160;
 
@@ -9,6 +11,7 @@ const N = 160;
 export default function TrafficChart() {
   const ref = useRef<HTMLCanvasElement>(null);
   const reduced = useReducedMotion();
+  const { palette: P } = useTheme();
 
   useEffect(() => {
     const canvas = ref.current!;
@@ -48,7 +51,7 @@ export default function TrafficChart() {
       const step = w / (N - 2);
       const y = (val: number) => h - 6 - val * (h - 14);
 
-      ctx.strokeStyle = "rgba(138,154,147,0.1)";
+      ctx.strokeStyle = P.line;
       ctx.lineWidth = 1;
       ctx.beginPath();
       for (const f of [0.33, 0.66]) {
@@ -73,17 +76,14 @@ export default function TrafficChart() {
       ctx.lineTo(0, h);
       ctx.closePath();
       const grad = ctx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, "rgba(61,245,196,0.22)");
-      grad.addColorStop(1, "rgba(61,245,196,0)");
+      grad.addColorStop(0, withAlpha(P.accent, 0.16));
+      grad.addColorStop(1, withAlpha(P.accent, 0));
       ctx.fillStyle = grad;
       ctx.fill();
 
-      ctx.strokeStyle = "#3DF5C4";
-      ctx.lineWidth = 1.5;
-      ctx.shadowColor = "#3DF5C4";
-      ctx.shadowBlur = 6;
+      ctx.strokeStyle = P.ink;
+      ctx.lineWidth = 1.25;
       ctx.stroke(line);
-      ctx.shadowBlur = 0;
     };
 
     const loop = (now: number) => {
@@ -130,7 +130,7 @@ export default function TrafficChart() {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("resize", resize);
     };
-  }, [reduced]);
+  }, [reduced, P]);
 
   return <canvas ref={ref} aria-hidden className="h-full w-full" />;
 }

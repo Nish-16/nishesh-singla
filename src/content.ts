@@ -108,13 +108,10 @@ export const identity = {
   github: "https://github.com/Nish-16",
   githubLabel: "github.com/Nish-16",
   status: "Open to SDE internships & full-time roles (2027)",
-  systemTag: "available",
 };
 
 export const hero = {
   eyebrow: "Full-stack developer · Thapar Institute '27",
-  ctaPrimary: { label: "View Projects", href: "/work#projects" },
-  ctaSecondary: { label: "Download Resume", href: site.resumePath },
   scrollHint: "scroll",
   /** Labels for the architecture graph in the hero. */
   graph: {
@@ -130,61 +127,29 @@ export const hero = {
 };
 
 // ---------------------------------------------------------------------------
-// Pages & sections
+// Sections (order = page order; headings read `~/label`)
 // ---------------------------------------------------------------------------
 
-export const pages = [
-  { href: "/", label: "Home" },
-  { href: "/work", label: "Work" },
-  { href: "/skills", label: "Skills" },
-  { href: "/contact", label: "Contact" },
-] as const;
-
-export const pageHeaders = {
-  work: {
-    title: "Work",
-    heading: "Production apps, developer tools, and the systems behind them.",
-    intro: "Experience first, then every project — filter by what you care about.",
-  },
-  skills: {
-    title: "Skills & Research",
-    heading: "The stack I reach for, and the research along the way.",
-    intro: "Hover a skill in the graph to see which projects it powers.",
-  },
-  contact: {
-    title: "Contact",
-    heading: "Let's build something that ships.",
-    intro: "Open to SDE internships & full-time roles (2027).",
-  },
-};
-
-/** Sections per page. The heading reads `~/label`. */
 export const sections = [
-  { id: "about", label: "About", page: "/" },
-  { id: "featured", label: "Featured", page: "/" },
-  { id: "experience", label: "Experience", page: "/work" },
-  { id: "projects", label: "Projects", page: "/work" },
-  { id: "skills", label: "Skills", page: "/skills" },
-  { id: "research", label: "Research", page: "/skills" },
-  { id: "contact", label: "Contact", page: "/contact" },
-  { id: "terminal", label: "Terminal", page: "/contact" },
+  { id: "about", label: "About", nav: true },
+  { id: "experience", label: "Experience", nav: true },
+  { id: "projects", label: "Projects", nav: true },
+  { id: "skills", label: "Skills", nav: true },
+  { id: "research", label: "Research", nav: false },
+  { id: "terminal", label: "Terminal", nav: false },
+  { id: "contact", label: "Contact", nav: true },
 ] as const;
 
 export type SectionId = (typeof sections)[number]["id"];
 
 export const sectionIntros: Record<SectionId, string> = {
   about: "I build the whole thing — API, data model, and UI.",
-  featured: "A few things I've built recently.",
   experience: "Roles that shipped to production.",
   projects: "Full-stack platforms, developer tools, and a few IoT builds.",
-  skills: "Languages, frameworks, and tools.",
+  skills: "Hover a skill to trace which projects it powers.",
   research: "Patents, rankings, and awards.",
-  contact: "Pick a channel.",
-  terminal: "Prefer a shell? Press ` on any page to open it.",
-};
-
-export const featuredLabels = {
-  viewAll: "View all projects",
+  terminal: "Prefer a shell? Press ` anywhere to open it.",
+  contact: "Let's build something that ships.",
 };
 
 // ---------------------------------------------------------------------------
@@ -271,9 +236,9 @@ export const projectCategories: {
   label: string;
   color: string;
 }[] = [
-  { id: "web", label: "Full-stack & Web", color: "#3DF5C4" },
-  { id: "security", label: "Security & Tools", color: "#8AB4F8" },
-  { id: "iot", label: "IoT & Embedded", color: "#F0B35A" },
+  { id: "web", label: "Full-stack & Web", color: "var(--cat-web)" },
+  { id: "security", label: "Security & Tools", color: "var(--cat-security)" },
+  { id: "iot", label: "IoT & Embedded", color: "var(--cat-iot)" },
 ];
 
 export const projectLabels = {
@@ -678,19 +643,21 @@ export const terminal = {
   help: [
     ["help", "list commands"],
     ["whoami", "who is this?"],
-    ["cd <page>", "go to home | work | skills | contact"],
+    ["cd <section>", "jump to about | experience | projects | skills | contact"],
     ["projects", "list projects"],
     ["skills", "list skills"],
     ["contact", "how to reach me"],
     ["resume", "open resume.pdf"],
     ["scan", "run the port scanner (simulated)"],
+    ["theme", "toggle light / dark"],
     ["clear", "clear the screen"],
   ] as [string, string][],
   notFound: (cmd: string) => `command not found: ${cmd}. Try \`help\`.`,
-  cdUsage: "usage: cd home | work | skills | contact",
-  cdGoing: (page: string) => `→ ${page}`,
-  projectsHint: "→ cd work for details",
+  cdUsage: "usage: cd about | experience | projects | skills | research | contact",
+  cdGoing: (section: string) => `→ ~/${section}`,
+  projectsHint: "→ cd projects for details",
   resumeMessage: "opening /resume.pdf …",
+  themeMessage: (t: string) => `theme → ${t}`,
   scan: {
     target: "portfolio.local (127.0.0.1)",
     openPorts: [
@@ -733,4 +700,6 @@ export const nav = {
   terminal: "Terminal",
   skip: "Skip to content",
   primary: "Primary",
+  toLight: "Switch to light theme",
+  toDark: "Switch to dark theme",
 };

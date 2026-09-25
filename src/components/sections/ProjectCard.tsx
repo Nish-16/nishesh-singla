@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { projectCategories, projectLabels, type Project, type ProjectCategory } from "@/content";
 import TiltCard from "@/components/ui/TiltCard";
 import Chip from "@/components/ui/Chip";
@@ -7,8 +6,8 @@ export const category = (id: ProjectCategory) => projectCategories.find((c) => c
 
 const CARD = "relative flex h-full w-full flex-col gap-4 rounded-xl p-5 text-left md:p-6";
 
-/** Project card: opens the detail modal (`onOpen`) or links to it (`href`). */
-export default function ProjectCard({ project: p, onOpen, href }: { project: Project; onOpen?: () => void; href?: string }) {
+/** Project card; clicking opens the detail modal. */
+export default function ProjectCard({ project: p, onOpen }: { project: Project; onOpen: () => void }) {
   const cat = category(p.category);
   const lead = p.metrics[0];
   const maxChips = p.featured ? 6 : 4;
@@ -18,7 +17,7 @@ export default function ProjectCard({ project: p, onOpen, href }: { project: Pro
     <>
       <div className="flex items-center justify-between gap-3 font-mono text-[11px]">
         <span className="flex items-center gap-2" style={{ color: cat.color }}>
-          <span aria-hidden className="h-1.5 w-1.5 rounded-full" style={{ background: cat.color, boxShadow: `0 0 8px ${cat.color}` }} />
+          <span aria-hidden className="h-1.5 w-1.5 rounded-full" style={{ background: cat.color }} />
           {cat.label}
           {p.featured && <span className="text-muted">· {projectLabels.featured}</span>}
         </span>
@@ -27,7 +26,7 @@ export default function ProjectCard({ project: p, onOpen, href }: { project: Pro
 
       <div>
         <h3 className={`font-display font-semibold leading-snug text-ink ${p.featured ? "text-2xl md:text-3xl" : "text-xl"}`}>{p.title}</h3>
-        {p.status && <p className="mt-1 font-mono text-[11px] text-warm">{p.status}</p>}
+        {p.status && <p className="mt-1 font-mono text-[11px] text-second">{p.status}</p>}
         <p className="mt-2 text-sm leading-relaxed text-ink/75">{p.summary}</p>
       </div>
 
@@ -52,15 +51,9 @@ export default function ProjectCard({ project: p, onOpen, href }: { project: Pro
 
   return (
     <TiltCard glow={cat.color}>
-      {href ? (
-        <Link href={href} aria-label={label} className={CARD}>
-          {content}
-        </Link>
-      ) : (
-        <button type="button" onClick={onOpen} aria-haspopup="dialog" aria-label={label} className={CARD}>
-          {content}
-        </button>
-      )}
+      <button type="button" onClick={onOpen} aria-haspopup="dialog" aria-label={label} className={CARD}>
+        {content}
+      </button>
     </TiltCard>
   );
 }

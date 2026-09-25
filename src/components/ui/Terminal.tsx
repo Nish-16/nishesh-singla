@@ -1,8 +1,9 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
-import { identity, pages, projectCategories, projects, site, skillGroups, terminal } from "@/content";
+import { identity, projectCategories, projects, sections, site, skillGroups, terminal } from "@/content";
+import { scrollToTarget } from "@/lib/scroll";
+import { useTheme } from "@/components/ThemeProvider";
 import { useReducedMotion } from "@/lib/hooks";
 
 type Line = { id: number; kind: "in" | "out" | "dim" | "accent" | "err"; text: string; href?: string };
@@ -26,7 +27,7 @@ export function Terminal({ autoFocus = false, onExit, className = "" }: { autoFo
   const cancelScan = useRef<(() => void) | null>(null);
   const reduced = useReducedMotion();
   const inputId = useId();
-  const router = useRouter();
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     if (autoFocus) inputRef.current?.focus();
@@ -122,15 +123,20 @@ export function Terminal({ autoFocus = false, onExit, className = "" }: { autoFo
           break;
         case "cd": {
           const target = (arg ?? "").replace(/^~?\/?/, "").toLowerCase();
-          const page = pages.find((p) => p.label.toLowerCase() === (target || "home"));
-          if (!page) {
+          const section = sections.find((s) => s.id === target);
+          if (!section) {
             print(line("err", terminal.cdUsage));
           } else {
-            print(line("accent", terminal.cdGoing(page.href)));
-            router.push(page.href);
+            print(line("accent", terminal.cdGoing(section.id)));
+            onExit?.();
+            scrollToTarget(`#${section.id}`);
           }
           break;
         }
+        case "theme":
+          toggleTheme();
+          print(line("accent", terminal.themeMessage(theme === "dark" ? "light" : "dark")));
+          break;
         case "clear":
           setLines([]);
           break;
@@ -141,7 +147,7 @@ export function Terminal({ autoFocus = false, onExit, className = "" }: { autoFo
           print(line("err", terminal.notFound(name)));
       }
     },
-    [print, runScan, onExit, router],
+    [print, runScan, onExit, theme, toggleTheme],
   );
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -184,27 +190,27 @@ export function Terminal({ autoFocus = false, onExit, className = "" }: { autoFo
     in: "text-ink",
     out: "text-ink/85",
     dim: "text-muted",
-    accent: "text-signal",
-    err: "text-warm-bright",
+    accent: "text-accent",
+    err: "text-second",
   };
 
   return (
     <div
-      className={`flex flex-col overflow-hidden rounded-xl border border-line bg-[#070b09] focus-within:border-signal/50 font-mono text-[13px] leading-6 shadow-[0_0_0_1px_rgb(61_245_196/0.05),0_24px_60px_-20px_rgb(0_0_0/0.8)] ${className}`}
+      className={`flex flex-col overflow-hidden rounded-xl border border-line bg-surface focus-within:border-accent/50 font-mono text-[13px] leading-6 ${className}`}
       onClick={() => inputRef.current?.focus()}
     >
       <div className="flex items-center gap-2 border-b border-line bg-surface px-4 py-2">
-        <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-warm/80" />
-        <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-warm/70" />
-        <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-signal/80" />
+        <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-second/80" />
+        <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-second/70" />
+        <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-accent/80" />
         <span className="ml-2 truncate text-xs text-muted">{terminal.title}</span>
       </div>
       <div ref={scrollRef} data-lenis-prevent className="scrollbar-thin min-h-0 flex-1 overflow-y-auto px-4 py-3" role="log" aria-live="polite">
         {lines.map((l) => (
           <div key={l.id} className={`whitespace-pre-wrap break-words ${color[l.kind]}`}>
-            {l.kind === "in" && <span className="text-signal">{terminal.prompt} </span>}
+            {l.kind === "in" && <span className="text-accent">{terminal.prompt} </span>}
             {l.href ? (
-              <a href={l.href} target={l.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="underline decoration-line underline-offset-4 hover:text-signal">
+              <a href={l.href} target={l.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="underline decoration-line underline-offset-4 hover:text-accent">
                 {l.text}
               </a>
             ) : (
@@ -213,7 +219,7 @@ export function Terminal({ autoFocus = false, onExit, className = "" }: { autoFo
           </div>
         ))}
         <div className="flex items-center">
-          <label htmlFor={inputId} className="shrink-0 text-signal">
+          <label htmlFor={inputId} className="shrink-0 text-accent">
             {terminal.prompt}&nbsp;
           </label>
           <input
@@ -227,7 +233,7 @@ export function Terminal({ autoFocus = false, onExit, className = "" }: { autoFo
             autoCapitalize="off"
             spellCheck={false}
             aria-label="Terminal command"
-            className="min-w-0 flex-1 bg-transparent text-ink caret-signal outline-none focus-visible:outline-none"
+            className="min-w-0 flex-1 bg-transparent text-ink caret-accent outline-none focus-visible:outline-none"
           />
         </div>
       </div>

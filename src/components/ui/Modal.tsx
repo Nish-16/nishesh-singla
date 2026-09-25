@@ -79,7 +79,7 @@ export default function Modal({
           exit={{ opacity: 0 }}
           transition={{ duration: reduced ? 0 : 0.2 }}
         >
-          <div className="absolute inset-0 bg-board/80 backdrop-blur-sm" onClick={onClose} aria-hidden />
+          <div className="absolute inset-0 bg-canvas/80 backdrop-blur-sm" onClick={onClose} aria-hidden />
           <motion.div
             ref={panelRef}
             role="dialog"

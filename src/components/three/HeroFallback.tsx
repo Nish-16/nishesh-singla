@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { ARCH_EDGES, ARCH_NODES, NODE_H, NODE_W, bezier, edgeControlPoints } from "@/lib/arch";
+import type { Palette } from "@/lib/theme";
 
 const CURVES = ARCH_EDGES.map(([a, b]) => edgeControlPoints(a, b));
 
@@ -9,7 +10,7 @@ const CURVES = ARCH_EDGES.map(([a, b]) => edgeControlPoints(a, b));
  * Lightweight 2D canvas version of the hero graph, for mobile and reduced motion.
  * Animates packets on mobile; renders a single static frame when `animate` is false.
  */
-export default function HeroFallback({ animate }: { animate: boolean }) {
+export default function HeroFallback({ animate, palette: P }: { animate: boolean; palette: Palette }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -40,8 +41,8 @@ export default function HeroFallback({ animate }: { animate: boolean }) {
 
     const draw = (time: number) => {
       ctx.clearRect(0, 0, w, h);
-      ctx.globalAlpha = 0.55;
-      ctx.strokeStyle = "#3DF5C4";
+      ctx.globalAlpha = 0.8;
+      ctx.strokeStyle = P.muted;
       ctx.lineWidth = 1;
       for (const cp of CURVES) {
         ctx.beginPath();
@@ -54,32 +55,30 @@ export default function HeroFallback({ animate }: { animate: boolean }) {
       for (const n of ARCH_NODES) {
         const x = X(n.pos[0] - NODE_W / 2);
         const y = Y(n.pos[1] + NODE_H / 2);
-        ctx.fillStyle = "#111916";
-        ctx.strokeStyle = "rgba(61,245,196,0.6)";
+        ctx.fillStyle = P.surface;
+        ctx.strokeStyle = P.lineStrong;
         ctx.fillRect(x, y, NODE_W * scale, NODE_H * scale);
         ctx.strokeRect(x + 0.5, y + 0.5, NODE_W * scale, NODE_H * scale);
-        ctx.fillStyle = "#E6EDE9";
+        ctx.fillStyle = P.ink;
         ctx.font = `600 ${Math.max(9, scale * 0.26)}px ${mono}`;
         ctx.textBaseline = "middle";
         ctx.fillText(n.label, x + scale * 0.14, y + (NODE_H * scale) / 2);
       }
 
       const t = time / 1000;
-      ctx.shadowBlur = 10;
       CURVES.forEach((cp, i) => {
         const u = ((i * 0.37) % 1 + t * 0.32) % 1;
         const [x, y] = bezier(cp, u);
-        ctx.fillStyle = ctx.shadowColor = "#3DF5C4";
+        ctx.fillStyle = P.accent;
         ctx.beginPath();
         ctx.arc(X(x), Y(y), Math.max(2, scale * 0.07), 0, Math.PI * 2);
         ctx.fill();
         const [bx, by] = bezier(cp, 1 - ((u + 0.25) % 1));
-        ctx.fillStyle = ctx.shadowColor = "#F0B35A";
+        ctx.fillStyle = P.ink;
         ctx.beginPath();
         ctx.arc(X(bx), Y(by), Math.max(2, scale * 0.06), 0, Math.PI * 2);
         ctx.fill();
       });
-      ctx.shadowBlur = 0;
     };
 
     const loop = (time: number) => {
@@ -106,7 +105,7 @@ export default function HeroFallback({ animate }: { animate: boolean }) {
       io.disconnect();
       window.removeEventListener("resize", onResize);
     };
-  }, [animate]);
+  }, [animate, P]);
 
   return <canvas ref={ref} aria-hidden className="h-full w-full" />;
 }

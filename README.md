@@ -1,10 +1,12 @@
 # Nishesh Singla — Portfolio
 
-A multi-page developer portfolio. The home hero is a live 3D system-architecture graph (browser → Next.js → API/auth/functions → databases) with request/response packets flowing between services.
+A single-page developer portfolio. The hero is a live 3D system-architecture graph (browser → Next.js → API/auth/functions → databases) with request/response packets flowing between services.
 
-**Pages:** `/` (hero, about, featured work) · `/work` (experience + projects) · `/skills` (skills graph + research) · `/contact` (contact form + terminal). Press <kbd>`</kbd> on any page for the terminal (`cd work`, `projects`, `scan`, …).
+**Sections:** hero · about · experience · projects · skills · research · terminal · contact. Press <kbd>`</kbd> anywhere for the terminal (`cd projects`, `whoami`, `scan`, …).
 
-**Stack:** Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · React Three Fiber + drei + postprocessing · Framer Motion · Lenis · Firebase (Firestore, contact form)
+**Themes:** light (Paper & Ink) and dark (Mono + Lime). `ThemeProvider` (`useTheme()`) reads/writes `<html data-theme>`; an inline script in `layout.tsx` applies the stored choice (or the OS preference) before first paint. Colours live as CSS variables in `globals.css`, mirrored in `src/lib/theme.ts` for the canvas/three.js code. Toggle in the header or run `theme` in the terminal.
+
+**Stack:** Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · React Three Fiber + drei · Framer Motion · Lenis · Firebase (Firestore, contact form)
 
 ## Setup
 
@@ -22,8 +24,8 @@ Other scripts: `npm run build`, `npm start`, `npm run lint`.
 
 - Project links are `null` placeholders marked `// TODO` — the modal shows "link coming soon" until you fill them in.
 - IoT project readouts (`readout`, shown in the project modal) are *simulated* and labelled `SIM`.
-- Project order in `projects` is display order; `featured: true` projects also appear on the home page.
-- Deep link to a project modal with `/work#project-<slug>`.
+- Project order in `projects` is display order; `featured: true` projects render as larger cards.
+- Deep link to a project modal with `/#project-<slug>`.
 - Skill → project links in the graph come from each project's `stack` (via `match`) plus explicit `projects` slugs.
 
 ## Before deploying
@@ -48,18 +50,18 @@ Other scripts: `npm run build`, `npm start`, `npm run lint`.
 
 ```
 src/
-  app/                 layout, template (page transition), / + work/ + skills/ + contact/, sitemap, robots, opengraph-image
+  app/                 layout, page, sitemap, robots, opengraph-image
   content.ts           all copy + data
   components/
-    Providers.tsx      Lenis, scroll rail, cursor, terminal overlay
-    sections/          Hero, TrafficChart, About, FeaturedWork, Experience, Projects, ProjectCard, Skills, Research, Contact, TerminalSection
+    Providers.tsx      theme, Lenis, scroll rail, terminal overlay
+    sections/          Hero, TrafficChart, About, Experience, Projects, ProjectCard, Skills, Research, TerminalSection, Contact
     three/             HeroScene (R3F architecture graph), HeroFallback (2D canvas), XplorRoom (modal demo)
-    ui/                Header (tabs), Footer, PageHeader, SectionHeading, ScrollRail, ScrambleText, MagneticButton, TiltCard, Modal, Terminal, …
+    ui/                Header (scroll-spy nav), ThemeToggle, Footer, SectionHeading, ScrollRail, ScrambleText, TiltCard, Modal, Terminal, …
   lib/                 hooks, arch graph layout, skill graph layout, scroll lock, firebase
 ```
 
 ## Performance & accessibility notes
 
 - Three.js canvases load via `next/dynamic` with `ssr: false`; the hero stops rendering when off-screen and the XPLOR room renders on demand. DPR is capped at 1.5.
-- On screens < 768px or with `prefers-reduced-motion`, the hero uses a lightweight 2D canvas (static under reduced motion), and the cursor ring, tilt, and magnetic effects are off.
+- On screens < 768px or with `prefers-reduced-motion`, the hero uses a lightweight 2D canvas (static under reduced motion), and card tilt is off. Cursors are plain CSS (themed SVG wedge pointer / serif I-beam in `globals.css`), so text selection stays native.
 - Modals trap focus, close on Esc, and restore focus; the terminal opens with <kbd>`</kbd> and closes with <kbd>Esc</kbd>.

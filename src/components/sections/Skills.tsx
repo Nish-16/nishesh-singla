@@ -21,7 +21,7 @@ export default function Skills() {
 
   const linkedSkills = useMemo(() => new Set(graph.nodes.filter((n) => n.kind === "skill").map((n) => n.id)), [graph.nodes]);
   const byId = useMemo(() => new Map(graph.nodes.map((n) => [n.id, n])), [graph.nodes]);
-  const color = (cat?: string) => projectCategories.find((c) => c.id === cat)?.color ?? "#E6EDE9";
+  const color = (cat?: string) => projectCategories.find((c) => c.id === cat)?.color ?? "var(--color-ink)";
 
   const describe = (id: string) => {
     const n = byId.get(id)!;
@@ -38,7 +38,7 @@ export default function Skills() {
       <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
         {skillGroups.map((g) => (
           <div key={g.label}>
-            <h3 className="label-mono mb-3 text-[11px] text-warm">{g.label}</h3>
+            <h3 className="label-mono mb-3 text-[11px] text-second">{g.label}</h3>
             <ul className="flex flex-wrap gap-2">
               {g.skills.map((s) => {
                 const id = `s:${s.name}`;
@@ -50,7 +50,7 @@ export default function Skills() {
                       onPointerEnter={interactive ? () => setFocus(id) : undefined}
                       onPointerLeave={interactive ? () => setFocus(null) : undefined}
                       className={`inline-flex rounded-md border px-2.5 py-1 font-mono text-xs transition-colors ${
-                        on ? "border-signal bg-signal/10 text-signal" : "border-line bg-surface text-ink/85"
+                        on ? "border-accent bg-accent/10 text-accent" : "border-line bg-surface text-ink/85"
                       }`}
                     >
                       {s.name}
@@ -82,9 +82,8 @@ export default function Skills() {
                     y1={a.y}
                     x2={b.x}
                     y2={b.y}
-                    stroke={on ? color(b.category) : "#22302a"}
+                    style={{ stroke: on ? color(b.category) : "var(--color-line)", strokeOpacity: neighbours && !on ? 0.35 : 1 }}
                     strokeWidth={on ? 1.6 : 1}
-                    strokeOpacity={neighbours && !on ? 0.35 : 1}
                     className="transition-[stroke,stroke-opacity] duration-200"
                   />
                 );
@@ -94,7 +93,7 @@ export default function Skills() {
               const dim = neighbours && !neighbours.has(n.id);
               const on = neighbours?.has(n.id);
               const isProject = n.kind === "project";
-              const c = isProject ? color(n.category) : "#E6EDE9";
+              const c = isProject ? color(n.category) : "var(--color-ink)";
               return (
                 <g
                   key={n.id}
@@ -106,21 +105,20 @@ export default function Skills() {
                   onPointerLeave={() => setFocus(null)}
                   onFocus={() => setFocus(n.id)}
                   onBlur={() => setFocus(null)}
-                  className="cursor-default outline-none transition-opacity duration-200 focus-visible:[&>circle]:stroke-signal"
+                  className="cursor-default outline-none transition-opacity duration-200 focus-visible:[&>circle]:stroke-accent"
                   style={{ opacity: dim ? 0.25 : 1 }}
-                  data-cursor
                 >
                   {isProject ? (
-                    <rect x={-7} y={-7} width={14} height={14} rx={2} fill="#0A0F0D" stroke={c} strokeWidth={on ? 2.5 : 1.5} />
+                    <rect x={-7} y={-7} width={14} height={14} rx={2} style={{ fill: "var(--color-canvas)", stroke: c }} strokeWidth={on ? 2.5 : 1.5} />
                   ) : (
-                    <circle r={on ? 6 : 4.5} fill={on ? "#3DF5C4" : "#0A0F0D"} stroke={on ? "#3DF5C4" : "#8A9A93"} strokeWidth={1.5} />
+                    <circle r={on ? 6 : 4.5} style={{ fill: on ? "var(--color-accent)" : "var(--color-canvas)", stroke: on ? "var(--color-accent)" : "var(--color-muted)" }} strokeWidth={1.5} />
                   )}
                   <text
                     y={isProject ? 22 : -11}
                     textAnchor="middle"
                     className="font-mono"
                     fontSize={isProject ? 12 : 11}
-                    fill={isProject ? c : on ? "#3DF5C4" : "#8A9A93"}
+                    style={{ fill: isProject ? c : on ? "var(--color-accent)" : "var(--color-muted)" }}
                   >
                     {n.label}
                   </text>

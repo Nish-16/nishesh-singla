@@ -2,17 +2,18 @@
 
 import type { ReactNode } from "react";
 import SmoothScroll from "./ui/SmoothScroll";
-import CustomCursor from "./ui/CustomCursor";
 import ScrollRail from "./ui/ScrollRail";
 import { TerminalProvider } from "./ui/Terminal";
+import { ThemeProvider } from "./ThemeProvider";
 
 export default function Providers({ children }: { children: ReactNode }) {
   return (
-    <TerminalProvider>
-      <SmoothScroll />
-      <ScrollRail />
-      {children}
-      <CustomCursor />
-    </TerminalProvider>
+    <ThemeProvider>
+      <TerminalProvider>
+        <SmoothScroll />
+        <ScrollRail />
+        {children}
+      </TerminalProvider>
+    </ThemeProvider>
   );
 }

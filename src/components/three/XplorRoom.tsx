@@ -2,6 +2,7 @@
 
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
+import { useTheme } from "@/components/ThemeProvider";
 
 type Box = { p: [number, number, number]; s: [number, number, number]; c: string };
 
@@ -26,12 +27,13 @@ const ROOM: Box[] = [
   { p: [1.0, 0.17, 0.5], s: [0.08, 0.34, 0.08], c: "#4a3324" },
   // shelf
   { p: [-2.7, 0.9, 1.2], s: [0.5, 1.8, 1.2], c: "#3a2e26" },
-  { p: [-2.45, 1.2, 1.0], s: [0.1, 0.3, 0.2], c: "#3df5c4" },
+  { p: [-2.45, 1.2, 1.0], s: [0.1, 0.3, 0.2], c: "#c6f432" },
   // side table
   { p: [2.3, 0.3, -1.8], s: [0.6, 0.6, 0.6], c: "#e6ede9" },
 ];
 
 export default function XplorRoom() {
+  const { palette } = useTheme();
   return (
     <Canvas
       frameloop="demand"
@@ -40,7 +42,7 @@ export default function XplorRoom() {
       gl={{ antialias: true }}
       aria-label="Interactive 3D room"
     >
-      <color attach="background" args={["#0d1411"]} />
+      <color attach="background" args={[palette.surface]} />
       <hemisphereLight args={["#fff3e6", "#20302a", 1.1]} />
       <directionalLight position={[4, 6, 3]} intensity={1.6} />
       {ROOM.map((b, i) => (
