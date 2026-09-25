@@ -54,7 +54,9 @@ export default function Projects() {
 
   const filters: { id: Filter; label: string; count: number }[] = [
     { id: "all", label: projectLabels.all, count: projects.length },
-    ...projectCategories.map((c) => ({ id: c.id, label: c.label, count: projects.filter((p) => p.category === c.id).length })),
+    ...projectCategories
+      .map((c) => ({ id: c.id, label: c.label, count: projects.filter((p) => p.category === c.id).length }))
+      .filter((c) => c.count > 0),
   ];
 
   return (
@@ -133,6 +135,7 @@ function ProjectDetail({ project: p, onClose }: { project: Project; onClose: () 
             {p.title}
           </h3>
           {p.status && <p className="mt-1 font-mono text-xs text-second">{p.status}</p>}
+          {p.context && <p className="mt-1 text-sm text-muted">{p.context}</p>}
         </div>
         <button
           type="button"
@@ -155,45 +158,55 @@ function ProjectDetail({ project: p, onClose }: { project: Project; onClose: () 
           </figure>
         )}
 
-        <DetailBlock label={projectLabels.problem}>
-          <p className="text-ink/85">{p.problem}</p>
-        </DetailBlock>
+        {p.problem.trim() && (
+          <DetailBlock label={projectLabels.problem}>
+            <p className="text-ink/85">{p.problem}</p>
+          </DetailBlock>
+        )}
 
-        <DetailBlock label={projectLabels.built}>
-          <ul className="space-y-2 text-ink/85">
-            {p.built.map((b) => (
-              <li key={b} className="flex gap-3">
-                <span aria-hidden className="mt-2.5 h-1 w-3 shrink-0" style={{ background: cat.color }} />
-                <span>{b}</span>
-              </li>
-            ))}
-          </ul>
-        </DetailBlock>
+        {p.built.some((b) => b.trim()) && (
+          <DetailBlock label={projectLabels.built}>
+            <ul className="space-y-2 text-ink/85">
+              {p.built
+                .filter((b) => b.trim())
+                .map((b) => (
+                  <li key={b} className="flex gap-3">
+                    <span aria-hidden className="mt-2.5 h-1 w-3 shrink-0" style={{ background: cat.color }} />
+                    <span>{b}</span>
+                  </li>
+                ))}
+            </ul>
+          </DetailBlock>
+        )}
 
-        <DetailBlock label={projectLabels.numbers}>
-          <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {p.metrics.map((m) => (
-              <div key={m.label} className="flex flex-col-reverse rounded-lg border border-line bg-canvas/60 p-3">
-                <dt className="mt-1 text-xs text-muted">{m.label}</dt>
-                <dd className="font-mono text-xl font-semibold" style={{ color: cat.color }}>
-                  {m.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </DetailBlock>
+        {p.metrics.length > 0 && (
+          <DetailBlock label={projectLabels.numbers}>
+            <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {p.metrics.map((m) => (
+                <div key={m.label} className="flex flex-col-reverse rounded-lg border border-line bg-canvas/60 p-3">
+                  <dt className="mt-1 text-xs text-muted">{m.label}</dt>
+                  <dd className="font-mono text-xl font-semibold" style={{ color: cat.color }}>
+                    {m.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </DetailBlock>
+        )}
 
         {p.readout && <SensorReadout fields={p.readout} simLabel={projectLabels.simulated} />}
 
-        <DetailBlock label={projectLabels.stack}>
-          <div className="flex flex-wrap gap-1.5">
-            {p.stack.map((t) => (
-              <Chip key={t} tone={p.category === "iot" ? "second" : "accent"}>
-                {t}
-              </Chip>
-            ))}
-          </div>
-        </DetailBlock>
+        {p.stack.length > 0 && (
+          <DetailBlock label={projectLabels.stack}>
+            <div className="flex flex-wrap gap-1.5">
+              {p.stack.map((t) => (
+                <Chip key={t} tone={p.category === "iot" ? "second" : "accent"}>
+                  {t}
+                </Chip>
+              ))}
+            </div>
+          </DetailBlock>
+        )}
 
         <div className="flex flex-wrap gap-3 border-t border-line pt-6">
           {links.map((l) =>

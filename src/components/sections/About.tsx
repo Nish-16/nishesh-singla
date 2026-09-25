@@ -4,6 +4,7 @@ import { about as aboutLabels } from "@/content";
 import { useSiteContent } from "@/components/SiteContentProvider";
 import SectionHeading from "@/components/ui/SectionHeading";
 import CountUp from "@/components/ui/CountUp";
+import Chip from "@/components/ui/Chip";
 
 export default function About() {
   const { about, identity } = useSiteContent();
@@ -11,14 +12,37 @@ export default function About() {
     <section id="about" aria-labelledby="about-title" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-24 sm:px-6 md:py-32 md:pl-20">
       <SectionHeading id="about" />
       <div className="grid gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-14">
-        <div className="space-y-5 text-lg leading-relaxed text-ink/85">
-          {about.bio.map((p) => (
-            <p key={p}>{p}</p>
-          ))}
+        <div className="flex flex-col gap-10">
+          <div className="space-y-5 text-lg leading-relaxed text-ink/85">
+            {about.bio.map((p) => (
+              <p key={p}>{p}</p>
+            ))}
+          </div>
+
+          <div className="rounded-xl border border-line bg-surface p-5">
+            <p className="label-mono text-[11px] text-second">{aboutLabels.educationLabels.title}</p>
+            <h3 className="mt-2 font-display text-lg font-semibold leading-snug text-ink">{about.education.school}</h3>
+            <p className="mt-1 text-sm text-ink/80">{about.education.degree}</p>
+            <p className="mt-1 font-mono text-xs text-muted">
+              {about.education.dates} · {about.education.location}
+            </p>
+            {about.education.coursework.length > 0 && (
+              <>
+                <p className="mt-4 text-xs text-muted">{aboutLabels.educationLabels.coursework}</p>
+                <ul className="mt-2 flex flex-wrap gap-1.5">
+                  {about.education.coursework.map((c) => (
+                    <li key={c}>
+                      <Chip>{c}</Chip>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
         </div>
 
         {/* profile.json card */}
-        <aside aria-label={aboutLabels.profileFile} className="overflow-hidden rounded-xl border border-line bg-surface font-mono text-sm">
+        <aside aria-label={aboutLabels.profileFile} className="self-start overflow-hidden rounded-xl border border-line bg-surface font-mono text-sm lg:sticky lg:top-24">
           <div className="flex items-center gap-2 border-b border-line bg-surface-2/60 px-4 py-2.5">
             <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-second/80" />
             <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-muted/50" />

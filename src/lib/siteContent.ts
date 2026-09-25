@@ -12,6 +12,7 @@ import {
   sectionIntros,
   skillGroups,
   type Achievement,
+  type Education,
   type Project,
   type Role,
   type SectionId,
@@ -22,7 +23,7 @@ import {
 export interface SiteContent {
   identity: typeof identity;
   hero: { eyebrow: string };
-  about: { bio: string[]; profileRole: string; stats: Stat[] };
+  about: { bio: string[]; profileRole: string; stats: Stat[]; education: Education };
   sectionIntros: Record<SectionId, string>;
   experience: Role[];
   projects: Project[];
@@ -39,7 +40,7 @@ export const CONTENT_TAG = "site-content";
 export const defaultContent: SiteContent = {
   identity,
   hero: { eyebrow: hero.eyebrow },
-  about: { bio: about.bio, profileRole: about.profileRole, stats: about.stats },
+  about: { bio: about.bio, profileRole: about.profileRole, stats: about.stats, education: about.education },
   sectionIntros,
   experience,
   projects,
@@ -63,6 +64,7 @@ export function mergeContent(remote: unknown): SiteContent {
       bio: arr(about.bio, d.about.bio),
       profileRole: typeof about.profileRole === "string" ? about.profileRole : d.about.profileRole,
       stats: arr(about.stats, d.about.stats),
+      education: { ...d.about.education, ...(isObj(about.education) ? (about.education as Partial<Education>) : {}) },
     },
     sectionIntros: { ...d.sectionIntros, ...(isObj(r.sectionIntros) ? (r.sectionIntros as Partial<SiteContent["sectionIntros"]>) : {}) },
     experience: arr(r.experience, d.experience),

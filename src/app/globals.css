@@ -59,11 +59,19 @@
   --color-second: #2f5d50;
 }
 
-/* Project category colours: full-stack = accent, security = ink, IoT = muted (lower priority). */
-:root {
-  --cat-web: var(--color-accent);
-  --cat-security: var(--color-ink);
-  --cat-iot: var(--color-muted);
+/* Project category colours (cards, filters, skill graph). One distinct hue per category, readable on both themes. */
+:root,
+[data-theme="dark"] {
+  --cat-web: #c6f432; /* full-stack & web */
+  --cat-security: #5ec8f0; /* networking, extensions & tools */
+  --cat-iot: #f2a541; /* hardware / IoT */
+  --cat-ai: #b69cff; /* AI & ML */
+}
+[data-theme="light"] {
+  --cat-web: #bf4320;
+  --cat-security: #1f6fb2;
+  --cat-iot: #8a5a00;
+  --cat-ai: #6d4bd1;
 }
 
 html {

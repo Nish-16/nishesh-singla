@@ -69,6 +69,16 @@ export function ProfileEditor({ value, onChange }: Edit<SiteContent>) {
         <Text label="Role" hint='Shown as "role" in profile.json.' value={about.profileRole} onChange={(v) => setAbout({ profileRole: v })} />
       </Card>
 
+      <Card title="Education" description="Shown under the bio.">
+        <Text label="School" value={about.education.school} onChange={(v) => setAbout({ education: { ...about.education, school: v } })} />
+        <Grid>
+          <Text label="Degree" value={about.education.degree} onChange={(v) => setAbout({ education: { ...about.education, degree: v } })} />
+          <Text label="Dates" placeholder="Sep 2023 – Jun 2027" value={about.education.dates} onChange={(v) => setAbout({ education: { ...about.education, dates: v } })} />
+        </Grid>
+        <Text label="Location" value={about.education.location} onChange={(v) => setAbout({ education: { ...about.education, location: v } })} />
+        <TagInput label="Relevant coursework" value={about.education.coursework} onChange={(v) => setAbout({ education: { ...about.education, coursework: v } })} />
+      </Card>
+
       <Card title="profile.json stats" description="Numbers count up when scrolled into view.">
         <StatsEditor value={about.stats} onChange={(stats) => setAbout({ stats })} />
       </Card>
@@ -144,8 +154,10 @@ export function ExperienceEditor({ value, onChange, selected, onSelect }: Edit<R
             <Text label="Period" placeholder="Jun 2025 – Jul 2025" value={r.period} onChange={(v) => set({ ...r, period: v })} />
             <Text label="Location" placeholder="Patiala" value={r.location} onChange={(v) => set({ ...r, location: v })} />
           </Grid>
+          <Text label="One-line summary" hint="Shown under the title." value={r.summary ?? ""} onChange={(v) => set({ ...r, summary: v || undefined })} />
           <Select
             label="Type"
+            hint="Leadership roles show in the Leadership section instead of the timeline."
             value={r.kind}
             options={[
               { value: "work", label: "Work" },
@@ -212,6 +224,7 @@ export function ProjectsEditor({ value, onChange, selected, onSelect }: Edit<Pro
           </Grid>
           <Toggle label="Featured" description="Shows as a larger card." value={p.featured} onChange={(v) => set({ ...p, featured: v || undefined })} />
           <Text label="Status" hint="Optional, e.g. In progress." value={p.status ?? ""} onChange={(v) => set({ ...p, status: v || undefined })} />
+          <Text label="Context" hint="Optional, e.g. Freelance client work via Humble Solutions." value={p.context ?? ""} onChange={(v) => set({ ...p, context: v || undefined })} />
           <Area label="Card summary" soft={110} value={p.summary} onChange={(v) => set({ ...p, summary: v })} />
           <Area label="Problem" value={p.problem} onChange={(v) => set({ ...p, problem: v })} />
           <StringList label="What I built" addLabel="Add point" value={p.built} onChange={(v) => set({ ...p, built: v })} />

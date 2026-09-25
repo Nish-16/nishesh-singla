@@ -129,6 +129,20 @@ export default function Skills() {
             })}
           </svg>
         </div>
+        <ul aria-label="Project categories" className="mt-3 flex flex-wrap gap-x-5 gap-y-2 font-mono text-[11px] text-muted">
+          {projectCategories
+            .filter((c) => projects.some((p) => p.category === c.id))
+            .map((c) => (
+              <li key={c.id} className="flex items-center gap-2">
+                <span aria-hidden className="h-2.5 w-2.5 rounded-[3px] border-[1.5px]" style={{ borderColor: c.color }} />
+                {c.label}
+              </li>
+            ))}
+          <li className="flex items-center gap-2">
+            <span aria-hidden className="h-2.5 w-2.5 rounded-full border-[1.5px] border-muted" />
+            {skillLabels.legendSkill}
+          </li>
+        </ul>
       </figure>
     </section>
   );

@@ -9,7 +9,7 @@
 // Types
 // ---------------------------------------------------------------------------
 
-export type ProjectCategory = "web" | "security" | "iot";
+export type ProjectCategory = "web" | "security" | "iot" | "ai";
 
 export interface Metric {
   value: string;
@@ -47,6 +47,8 @@ export interface Project {
   readout?: ReadoutField[];
   /** Embedded interactive demo in the modal. */
   demo?: "xplor-room";
+  /** Modal: where/for whom it was built, e.g. "Freelance client work via Humble Solutions." */
+  context?: string;
 }
 
 export interface Role {
@@ -55,8 +57,18 @@ export interface Role {
   kind: "work" | "leadership";
   period: string;
   location: string;
+  /** One-line summary shown under the title. */
+  summary?: string;
   stack: string[];
   bullets: string[];
+}
+
+export interface Education {
+  school: string;
+  degree: string;
+  dates: string;
+  location: string;
+  coursework: string[];
 }
 
 export interface Skill {
@@ -152,6 +164,7 @@ export const sections = [
   { id: "projects", label: "Projects", nav: true },
   { id: "skills", label: "Skills", nav: true },
   { id: "research", label: "Research", nav: false },
+  { id: "leadership", label: "Leadership", nav: false },
   { id: "terminal", label: "Terminal", nav: false },
   { id: "contact", label: "Contact", nav: true },
 ] as const;
@@ -161,9 +174,10 @@ export type SectionId = (typeof sections)[number]["id"];
 export const sectionIntros: Record<SectionId, string> = {
   about: "I build the whole thing — API, data model, and UI.",
   experience: "Roles that shipped to production.",
-  projects: "Full-stack platforms, developer tools, and a few IoT builds.",
+  projects: "Full-stack platforms, AI agents, developer tools, and a few IoT builds.",
   skills: "Hover a skill to trace which projects it powers.",
-  research: "Patents, rankings, and awards.",
+  research: "Patents, papers, rankings, and awards.",
+  leadership: "Outside the code.",
   terminal: "Prefer a shell? Press ` anywhere to open it.",
   contact: "Let's build something that ships.",
 };
@@ -175,19 +189,41 @@ export const sectionIntros: Record<SectionId, string> = {
 export const about = {
   bio: [
     "I'm a full-stack developer and an Electrical & Computer Engineering student at Thapar Institute of Engineering and Technology (CGPA 9.29, ranked 2nd in my branch).",
-    "I build products end-to-end: production web apps for clients on Next.js and Firebase, a browser-based 3D interior design editor in React Three Fiber, and developer tools like a Chrome extension that inspects API traffic.",
+    "I like owning things end-to-end: I've shipped production web platforms for clients, been the sole developer of a browser-based 3D interior design editor, and more recently built an LLM + RAG support agent, security tooling, and a blockchain-anchored carbon credit platform.",
     "My EEC background means I'm comfortable lower in the stack too — I've connected ESP32 devices to real-time backends — but what I enjoy most is designing the API, the data model, and the UI that makes sense of it.",
   ],
   profileFile: "profile.json",
   profileRole: "Full-stack developer",
   stats: [
-    { key: "production_apps", value: 3, suffix: "+", note: "shipped" },
+    { key: "projects_built", value: 14 },
+    { key: "client_apps", value: 2, note: "in production" },
     { key: "experience_years", value: 1.5, decimals: 1, suffix: "+", note: "internship + freelance" },
     { key: "leetcode", value: 250, suffix: "+", note: "problems solved" },
     { key: "cgpa", value: 9.29, decimals: 2 },
     { key: "branch_rank", value: 2, prefix: "#", note: "EEC, TIET" },
     { key: "patents", value: 1, note: "application published" },
   ] satisfies Stat[],
+  education: {
+    school: "Thapar Institute of Engineering and Technology",
+    degree: "B.E. Electrical and Computer Engineering",
+    dates: "Sep 2023 – Jun 2027",
+    location: "Patiala, Punjab",
+    coursework: [
+      "Data Structures & Algorithms",
+      "Operating Systems",
+      "Computer Networks",
+      "Computer Architecture",
+      "Object-Oriented Programming",
+      "Database Management Systems",
+      "Machine Learning Techniques",
+      "Mathematics for Data Science",
+      "Discrete Mathematical Structures",
+      "Embedded Systems & IoT",
+      "Cyber & Network Security",
+      "Blockchain & its Applications",
+    ],
+  } satisfies Education,
+  educationLabels: { title: "Education", coursework: "Relevant coursework" },
 };
 
 // ---------------------------------------------------------------------------
@@ -201,12 +237,14 @@ export const experience: Role[] = [
     kind: "work",
     period: "May 2026 – Present",
     location: "Remote",
+    summary: "Turning client business workflows into production web platforms.",
     stack: ["Next.js", "Tailwind CSS", "Firebase Auth", "Firestore", "Cloud Functions"],
     bullets: [
-      "Built the TechnoFluid Lubricants platform: a role-based admin dashboard, CMS, and responsive UI across 15+ screens.",
-      "Engineered Hotel Dreamland, a full-stack hotel booking platform with 14 responsive screens, 28 reusable components, and Firestore across 8 collections.",
-      "Deployed 7 Firebase Cloud Functions to automate user management, content moderation, and admin workflows across production apps.",
-      "Enforced role-based access control and Firestore security rules to lock down administrative operations.",
+      "Translated client requirements into two production platforms, TechnoFluid Lubricants and Hotel Dreamland, converting business workflows into scalable web solutions.",
+      "Built TechnoFluid's role-based admin dashboard, CMS, and responsive UI across 15+ screens.",
+      "Engineered Hotel Dreamland: 14 responsive screens, 28 reusable components, Firebase Authentication, and Firestore across 8 collections.",
+      "Deployed 7 Firebase Cloud Functions to enforce server-side business logic and automate user management, content moderation, and admin workflows.",
+      "Secured admin operations with authentication, role-based access control, and Firestore security rules.",
     ],
   },
   {
@@ -214,13 +252,29 @@ export const experience: Role[] = [
     org: "Glyptika Studios",
     kind: "work",
     period: "May 2025 – May 2026",
-    location: "Patiala",
-    stack: ["React", "Three.js", "React Three Fiber", "Cannon-es", "Node.js", "Express"],
+    location: "Patiala, Punjab",
+    summary: "Sole developer of XPLOR, a browser-based 3D interior design editor.",
+    stack: ["React", "Three.js", "React Three Fiber", "Cannon-es", "Node.js", "Express", "Google OAuth"],
     bullets: [
-      "Sole developer of XPLOR, a browser-based 3D interior design editor: 9 routed pages, 7 core editor components, and 10+ object types.",
-      "Built scene save/load, camera controls, lighting, and GLB model import/export. Cut average scene load time by 30%.",
-      "Added physics-based collision handling with Cannon-es, so users can place uploaded 3D assets realistically.",
-      "Designed REST APIs (Node.js/Express) for scene persistence, with file-type upload restrictions and API rate limiting.",
+      "Contributed to market research for XPLOR, turning user needs into product requirements and technology-stack decisions.",
+      "Owned end-to-end development of the 3D scene editor: 9 routed pages, 7 core editor components, 10+ object types, real-time placement, camera controls, and lighting.",
+      "Engineered scene serialization, GLB model import/export, and persistence workflows, reducing average scene load time by 30%.",
+      "Added physics-based collision handling with Cannon-es so users can upload custom 3D assets and export composed scenes as a single file.",
+      "Integrated Google OAuth and a scene-persistence REST API (Node.js/Express), with file-type upload restrictions and API rate limiting.",
+    ],
+  },
+  {
+    title: "Summer Intern",
+    org: "Thapar Institute of Engineering and Technology",
+    kind: "work",
+    period: "Summer internship", // TODO: exact months + year, e.g. "Jun 2025 – Jul 2025"
+    location: "Patiala",
+    summary: "Team project turning a demo car into an autonomous vehicle using LiDAR and ROS.",
+    stack: ["ROS", "LiDAR", "IoT"], // TODO: add the web panel's stack
+    bullets: [
+      "Worked in a team converting a demo car into an autonomous vehicle using LiDAR and ROS (Robot Operating System).",
+      "Built the web panel on the software side of the project.", // TODO: what the panel showed/controlled
+      "Helped debug the IoT side and supported the team during integration and testing.",
     ],
   },
   {
@@ -229,10 +283,22 @@ export const experience: Role[] = [
     kind: "leadership",
     period: "Nov 2023 – Feb 2025",
     location: "Patiala",
-    stack: ["Sponsorship", "Content"],
+    stack: ["Sponsorship", "Events"],
     bullets: [
-      "Secured 3+ sponsors per event cycle through cold outreach.",
-      "Wrote content for 8+ events.",
+      "Ran sponsorship outreach through cold calling and email campaigns: 30+ prospective sponsors contacted, 3+ secured per event cycle.",
+      "Coordinated planning, marketing, and communications across 8+ events.",
+    ],
+  },
+  {
+    title: "Executive Member",
+    org: "Microsoft Learn Student Chapter, TIET",
+    kind: "leadership",
+    period: "Nov 2023 – Dec 2024",
+    location: "Patiala",
+    stack: ["Events", "Outreach"],
+    bullets: [
+      "Contributed to event planning, marketing, content, and outreach to drive student engagement.",
+      "Helped deliver 5+ technical and community events.",
     ],
   },
 ];
@@ -253,8 +319,9 @@ export const projectCategories: {
   color: string;
 }[] = [
   { id: "web", label: "Full-stack & Web", color: "var(--cat-web)" },
-  { id: "security", label: "Security & Tools", color: "var(--cat-security)" },
-  { id: "iot", label: "IoT & Embedded", color: "var(--cat-iot)" },
+  { id: "security", label: "Networking & Tools", color: "var(--cat-security)" },
+  { id: "ai", label: "AI & ML", color: "var(--cat-ai)" },
+  { id: "iot", label: "Hardware & IoT", color: "var(--cat-iot)" },
 ];
 
 export const projectLabels = {
@@ -278,24 +345,101 @@ export const projects: Project[] = [
     slug: "xplor",
     title: "XPLOR — 3D Interior Design Editor",
     category: "web",
-    stack: ["React", "Three.js", "R3F", "Cannon-es", "Node.js", "Express"],
+    stack: ["React", "Three.js", "R3F", "Cannon-es", "Node.js", "Express", "Google OAuth"],
     date: "2025–26",
     featured: true,
-    summary: "Design rooms in the browser — real-time placement, physics collisions, GLB import/export.",
-    problem: "Design rooms in the browser, with your own 3D assets, and export the whole scene as one file.",
+    context: "Built at Glyptika Studios as the sole developer.",
+    summary: "Design rooms in the browser: place, transform, and physically arrange 3D furniture, then export the scene.",
+    problem: "Planning an interior usually means expensive desktop software or guesswork. XPLOR brings a lightweight 3D room editor to the browser.",
     built: [
-      "Real-time object placement with physics-based collisions (Cannon-es), so uploaded 3D assets sit realistically.",
-      "GLB import/export — users bring in their own models and export the whole scene as one file.",
-      "Scene save/load, camera controls, and lighting; 9 routed pages, 7 core editor components, 10+ object types.",
-      "REST APIs (Node.js/Express) for scene persistence, with file-type upload restrictions and rate limiting.",
+      "9 routed pages and 7 core editor components with real-time object placement, transforms, camera controls, and lighting.",
+      "Support for 10+ object types, plus GLB import so users can bring their own 3D assets.",
+      "Physics-based collision handling with Cannon-es so objects don't clip through each other.",
+      "Scene serialization and save/load through a REST persistence API with Google OAuth.",
+      "Export of a composed scene as a single GLB file.",
+      "Upload file-type restrictions and API rate limiting against abusive requests.",
     ],
     metrics: [
       { value: "30%", label: "faster scene loads" },
-      { value: "9", label: "routed pages" },
       { value: "10+", label: "object types" },
+      { value: "7", label: "editor components" },
     ],
     links: { github: null, live: null }, // TODO: add repo + live URLs
     demo: "xplor-room",
+  },
+  {
+    slug: "ai-support-agent",
+    title: "AI Customer Support Agent",
+    category: "ai",
+    stack: ["Python", "LLMs", "Groq", "RAG", "ChromaDB", "Embeddings"],
+    date: "2026",
+    featured: true,
+    summary: "An LLM + RAG support agent that classifies intent, retrieves similar past tickets, and knows when to escalate.",
+    problem: "Support teams answer the same questions repeatedly. The hard part is answering well and knowing when not to answer.",
+    built: [
+      "Built on 5,938 real DropboxSupport tweet–reply pairs.",
+      "Classifies queries across 13 intents, retrieves similar historical conversations from ChromaDB, and applies rule-based escalation.",
+      "Embedding-based retrieval, schema validation, retry handling, and caching.",
+      "LLM-as-judge response evaluation, validated against human ratings.",
+    ],
+    metrics: [
+      { value: "81.0%", label: "intent accuracy (hand-labelled, n=174)" },
+      { value: "77.1%", label: "held-out split accuracy" },
+      { value: "40.8%", label: "TF-IDF + LogReg baseline" },
+      { value: "+72%", label: "retrieval precision gain" },
+      { value: "0.73", label: "judge ↔ human Spearman" },
+    ],
+    links: { github: null, live: null }, // TODO
+  },
+  {
+    slug: "youtube-ai-summarizer",
+    title: "YouTube AI Summarizer",
+    category: "ai",
+    stack: ["TypeScript", "React", "Chrome MV3", "Vite", "Zod", "LLMs", "Groq"],
+    date: "Sep 2026",
+    status: "In progress",
+    summary: "A Chrome extension that turns the YouTube video you're watching into structured study notes with an LLM.",
+    problem: "Turning a long lecture into study notes by hand is slow, and fetching captions from a server gets blocked by YouTube — so this runs in the browser, on your own session.",
+    built: [
+      "Manifest V3 extension with a React side panel: topics, key points, definitions, code/formulas, and timestamps for the current video.",
+      "Transcript extraction inside the page: reads the player response, prefers manual captions over auto-generated ones, and captures the player's caption token with a PerformanceObserver.",
+      "8 distinct failure states (no captions, unplayable, ad still playing, page structure changed…) so the user knows what actually went wrong.",
+      "Long videos are split into ~9-minute windows with 45-second overlap; pass 1 extracts topics per chunk, pass 2 merges duplicates and writes the summary.",
+      "Model output streams as JSON Lines, validated with Zod, and renders topic by topic.",
+      "Bring-your-own API key for Claude, OpenAI, Gemini, or Groq, with each provider's host permission requested only when chosen, plus 429 Retry-After handling.",
+      "Job progress persisted to chrome.storage.local so long generations survive MV3 service-worker restarts.",
+    ],
+    metrics: [
+      { value: "4", label: "LLM providers" },
+      { value: "2-pass", label: "chunked generation" },
+      { value: "8", label: "failure states" },
+    ],
+    links: { github: null, live: null }, // TODO
+  },
+  {
+    slug: "carbonguard",
+    title: "CarbonGuard — Carbon Credit Platform",
+    category: "web",
+    stack: ["Node.js", "Express", "PostgreSQL", "Prisma", "Solidity", "Ethereum Sepolia", "React", "Python", "ESP32", "Modbus"],
+    date: "2026",
+    featured: true,
+    status: "Capstone · in progress",
+    summary: "Turns verified renewable generation from ESP32 meters into tradeable carbon credits, settled on-chain.",
+    problem: "Small-scale renewable generators are shut out of carbon markets: verification is costly, and credit records are hard to trust.",
+    built: [
+      "ESP32 metering nodes stream generation telemetry to an Express backend.",
+      "A generation-based credit methodology benchmarked to CEA's 0.710 kgCO₂/kWh grid emission factor.",
+      "Dual authentication: JWT + RBAC for users, and HMAC-SHA256 with replay protection for devices.",
+      "A four-stage trade lifecycle with tamper-evident on-chain anchoring. On-chain settlement is the system of record, with PostgreSQL as the indexed read layer for dashboards.",
+      "ML price forecasting to guide generator pricing.",
+      "Co-authored a manuscript on the platform, submitted to an IEEE conference.",
+    ],
+    metrics: [
+      { value: "0.710", label: "kgCO₂/kWh emission factor" },
+      { value: "4", label: "trade lifecycle stages" },
+      { value: "2", label: "auth layers (JWT + HMAC)" },
+    ],
+    links: { github: null, live: null }, // TODO
   },
   {
     slug: "api-inspector",
@@ -304,13 +448,13 @@ export const projects: Project[] = [
     stack: ["React", "TypeScript", "Chrome MV3"],
     date: "Jun 2026",
     featured: true,
-    summary: "Chrome extension that captures a page's REST traffic live — filter, search, export, cURL.",
-    problem: "See the REST traffic a page makes — methods, status codes, timings, payloads — as it happens.",
+    summary: "A Manifest V3 extension that inspects REST traffic live, with filtering, cURL export, and JWT detection.",
+    problem: "Debugging APIs in DevTools means a lot of clicking, copying, and repeating.",
     built: [
-      "Manifest V3 extension that captures REST traffic live: methods, status codes, timings, and payloads.",
-      "Filtering, search, and JSON export.",
-      "One-click cURL generation for any captured request.",
-      "JWT detection in captured traffic.",
+      "Captures HTTP methods, status codes, response times, and payload metadata in real time.",
+      "Endpoint filtering, request search, and JSON export.",
+      "One-click cURL generation for replaying requests.",
+      "Automatic JWT detection in requests.",
     ],
     metrics: [
       { value: "MV3", label: "Chrome extension" },
@@ -322,43 +466,19 @@ export const projects: Project[] = [
     slug: "nbadms",
     title: "NBA Data Management System",
     category: "web",
-    stack: ["Next.js", "Express", "PostgreSQL", "Prisma"],
+    stack: ["Next.js", "Express", "PostgreSQL", "Prisma", "JWT"],
     date: "Oct 2025",
-    featured: true,
-    summary: "Accreditation compliance system — RBAC, 15+ REST APIs, audit logging on PostgreSQL.",
-    problem: "Track accreditation evidence — publications, patents, and projects — in one audited system.",
+    summary: "A full-stack accreditation compliance system for publications, patents, and projects, with RBAC.",
+    problem: "Accreditation (NBA) data is scattered across departments and spreadsheets, and it's painful to compile.",
     built: [
-      "RBAC with 3 roles and JWT auth.",
-      "6+ modules backed by 15+ REST APIs.",
-      "10+ Prisma entities on PostgreSQL.",
-      "Audit logging.",
+      "Role-based access control with 3 user roles across 6+ modules (publications, patents, projects).",
+      "15+ REST APIs with a modular architecture for auth, reporting, and workflows.",
+      "10+ PostgreSQL entities modeled with Prisma, plus JWT auth, session tracking, and audit logging.",
     ],
     metrics: [
       { value: "15+", label: "REST APIs" },
-      { value: "6+", label: "modules" },
-      { value: "3", label: "RBAC roles" },
-    ],
-    links: { github: null, live: null }, // TODO
-  },
-  {
-    slug: "carbon-credits",
-    title: "Carbon Credit Trading Platform",
-    category: "web",
-    stack: ["React", "Node.js", "PostgreSQL/Prisma", "Ethereum Sepolia", "Python", "ESP32"],
-    date: "2026",
-    featured: true,
-    status: "Capstone · in progress",
-    summary: "Metered renewable generation becomes carbon credits, traded and settled on Ethereum.",
-    problem: "Turn verified renewable generation into tradable carbon credits.",
-    built: [
-      "Node.js + PostgreSQL/Prisma backend that turns metered renewable generation into carbon credits.",
-      "Trades are settled and anchored on Ethereum (Sepolia).",
-      "React dashboard and ML-based price forecasting (Python).",
-      "ESP32/Modbus meters record generation; devices authenticate with HMAC.",
-    ],
-    metrics: [
-      { value: "Sepolia", label: "on-chain settlement" },
-      { value: "HMAC", label: "device authentication" },
+      { value: "10+", label: "DB entities" },
+      { value: "3", label: "user roles" },
     ],
     links: { github: null, live: null }, // TODO
   },
@@ -366,14 +486,15 @@ export const projects: Project[] = [
     slug: "technofluid",
     title: "TechnoFluid Lubricants Platform",
     category: "web",
-    stack: ["Next.js", "Tailwind", "Firebase"],
+    stack: ["Next.js", "Tailwind", "Firebase Auth", "Firestore", "Cloud Functions"],
     date: "2026",
-    summary: "Client platform with a role-based admin dashboard and CMS, in production.",
-    problem: "Let non-technical staff manage products and content themselves.",
+    context: "Freelance client work via Humble Solutions.",
+    summary: "A production client platform with a role-based admin dashboard and CMS.",
+    problem: "The client needed non-technical staff to manage products and content without touching code.",
     built: [
-      "Role-based admin dashboard and CMS for products and content.",
+      "A role-based admin dashboard and content management system.",
       "Responsive UI across 15+ screens.",
-      "Role-based access control and Firestore security rules to lock down admin operations.",
+      "Firestore security rules and server-side access controls.",
     ],
     metrics: [
       { value: "15+", label: "screens" },
@@ -385,14 +506,15 @@ export const projects: Project[] = [
     slug: "hotel-dreamland",
     title: "Hotel Dreamland",
     category: "web",
-    stack: ["Next.js", "Firebase Auth", "Firestore"],
+    stack: ["Next.js", "Firebase Auth", "Firestore", "Cloud Functions"],
     date: "2026",
-    summary: "Full-stack hotel booking platform with auth, bookings, and admin tooling.",
-    problem: "A hotel booking platform with authentication, bookings, and admin tooling.",
+    context: "Freelance client work via Humble Solutions.",
+    summary: "A full-stack hotel booking platform built for a client.",
+    problem: "The hotel needed direct online bookings and an admin panel to run them.",
     built: [
-      "Authentication, booking flows, and admin tooling.",
       "14 responsive screens built from 28 reusable components.",
-      "Firestore data model across 8 collections.",
+      "Firebase Authentication and Firestore across 8 collections.",
+      "Admin workflows automated with Cloud Functions.",
     ],
     metrics: [
       { value: "14", label: "screens" },
@@ -405,14 +527,14 @@ export const projects: Project[] = [
     slug: "port-scanner",
     title: "Network Port Scanner",
     category: "security",
-    stack: ["Python", "sockets", "ThreadPoolExecutor"],
+    stack: ["Python", "TCP/IP", "sockets", "ThreadPoolExecutor"],
     date: "Sep 2026",
-    summary: "Multithreaded TCP scanner with service inference and banner grabbing.",
-    problem: "Scan all 65,535 TCP ports of a host quickly, and say what's listening.",
+    summary: "A multithreaded TCP scanner covering all 65,535 ports, with service inference and banner grabbing.",
+    problem: "Sequential port scans are painfully slow; concurrency is the whole game.",
     built: [
-      "Multithreaded TCP scanner covering all 65,535 ports.",
-      "Hostname resolution, service inference, and banner grabbing.",
-      "100 concurrent threads via ThreadPoolExecutor.",
+      "Configurable scans across all 65,535 ports using Python sockets and ThreadPoolExecutor.",
+      "Hostname resolution, configurable timeouts, service inference, and banner grabbing.",
+      "Clean thread cleanup and resource handling.",
     ],
     metrics: [
       { value: "~99%", label: "faster (100.7s → 1.03s per 100 ports)" },
@@ -427,15 +549,14 @@ export const projects: Project[] = [
     category: "web",
     stack: ["React Native", "NativeWind", "Express"],
     date: "Feb 2026",
-    summary: "Cross-platform expense tracker with categories and budgets.",
-    problem: "Track expenses and budgets on any phone.",
+    summary: "A cross-platform expense tracker with categories, budgets, and transaction history.",
+    problem: "Tracking daily spending should take seconds, on any phone.",
     built: [
-      "Cross-platform expense tracker with 6 categories and budgets.",
-      "15+ reusable components that cut UI build time by 40%.",
-      "Express backend.",
+      "6 spending categories with persistent transaction history and budget management.",
+      "15+ reusable components for a consistent UX across iOS and Android, cutting UI build time by 40%.",
     ],
     metrics: [
-      { value: "40%", label: "faster UI build" },
+      { value: "40%", label: "faster UI builds" },
       { value: "15+", label: "reusable components" },
       { value: "6", label: "categories" },
     ],
@@ -445,25 +566,26 @@ export const projects: Project[] = [
     slug: "railway-seat",
     title: "Railway Seat Verification System",
     category: "iot",
-    stack: ["Node.js", "Express", "MongoDB", "ESP32"],
+    stack: ["Node.js", "Express", "MongoDB", "REST APIs", "ESP32"],
     date: "Aug 2025",
     status: "Patent application published",
-    summary: "Real-time seat-status backend (Node.js/MongoDB) fed by ESP32 occupancy sensors.",
-    problem: "Verify railway seat occupancy automatically and in real time.",
+    summary: "PNR-based passenger self-verification with live seat indicators, so ticket checkers handle only the exceptions.",
+    problem: "Ticket checkers manually match every passenger to their seat across 100+ berths per coach. It's slow, repetitive, and error-prone.",
     built: [
-      "Node.js/Express + MongoDB backend that syncs seat status live, with sub-second latency.",
-      "Handles 100+ passenger records.",
-      "ESP32 nodes detect seat occupancy and push updates to the backend.",
+      "PNR-based self-verification: each seat indicator flips from unverified to verified once the booking is validated.",
+      "ESP32 seat nodes synced in real time with a Node.js + MongoDB backend through REST APIs.",
+      "Handles 100+ passenger records with sub-second hardware-to-backend latency in local testing.",
+      "Shifts staff effort from checking every seat to handling only the exceptions, visible at a glance.",
     ],
     metrics: [
-      { value: "<1s", label: "seat status latency" },
-      { value: "100+", label: "passenger records" },
-      { value: "Patent", label: "Indian application published" },
+      { value: "<1s", label: "seat-status latency" },
+      { value: "100+", label: "berths per coach" },
+      { value: "Patent", label: "Indian application 202511086732 A" },
     ],
-    links: { github: null, live: null }, // TODO
+    links: { github: null, live: null }, // TODO: add patent publication link
     readout: [
       { label: "SEAT", text: "S4-42" },
-      { label: "OCC", text: "YES" },
+      { label: "PNR", text: "VERIFIED" },
       { label: "SYNC", base: 0.42, jitter: 0.12, decimals: 2, unit: "s" },
     ],
   },
@@ -473,16 +595,16 @@ export const projects: Project[] = [
     category: "iot",
     stack: ["Next.js", "Firebase", "ESP32", "RFID"],
     date: "May 2026",
-    summary: "Next.js + Firebase asset dashboard with sub-second check-in/out from RFID scans.",
-    problem: "Know where tagged assets are without manual logbooks.",
+    summary: "Tap-to-track inventory: automated check-in and check-out for 100+ tagged assets.",
+    problem: "Manual asset registers drift out of date quickly.",
     built: [
-      "Next.js dashboard backed by Firebase for 100+ tagged assets.",
-      "Automated check-in/check-out — the database updates in under 1 second after a tag is detected.",
-      "ESP32 + RFID reader on the edge.",
+      "Uniquely identifies and manages 100+ assets with RFID tags.",
+      "ESP32 + RFID reader integrated with a Next.js + Firebase dashboard for automated check-in/check-out and inventory monitoring.",
+      "The database updates in under 1 second after a tag is detected.",
     ],
     metrics: [
       { value: "<1s", label: "tag → database" },
-      { value: "100+", label: "tagged assets" },
+      { value: "100+", label: "assets tracked" },
     ],
     links: { github: null, live: null }, // TODO
     readout: [
@@ -496,12 +618,12 @@ export const projects: Project[] = [
     category: "iot",
     stack: ["Firebase", "Blynk", "ESP32", "SCT013", "ZMPT101B"],
     date: "Apr 2025",
-    summary: "Cloud-logged energy monitoring with a live, historical dashboard.",
-    problem: "Monitor voltage, current, power, and energy live, with history.",
+    summary: "Real-time voltage, current, power, and energy monitoring with calibrated sensors and cloud logging.",
+    problem: "Households can't see their electricity use as it happens, only on the monthly bill.",
     built: [
-      "Cloud logging (Firebase) and a historical dashboard (Blynk) on 2-second refresh intervals.",
-      "Sensor calibration brings accuracy to ±3–5%.",
-      "ESP32 with SCT013 (current) and ZMPT101B (voltage) sensors.",
+      "Voltage and current sensing with SCT013 and ZMPT101B on an ESP32.",
+      "Sensor calibration to reach ±3–5% accuracy.",
+      "Cloud data logging and a real-time dashboard with historical analysis.",
     ],
     metrics: [
       { value: "2s", label: "refresh interval" },
@@ -520,15 +642,16 @@ export const projects: Project[] = [
     category: "iot",
     stack: ["Node.js", "ESP32", "NEO-6M GPS"],
     date: "Jul 2025",
-    summary: "Live GPS tracking map with route history on a Node.js backend.",
-    problem: "Track a bicycle's position live and keep its route history.",
+    summary: "A GPS cycle tracker with a live map dashboard and route history.",
+    problem: "Cheap, self-built live tracking for bicycles.",
     built: [
-      "Live map refreshing every 2 seconds, with route history on a Node.js backend.",
-      "ESP32 with a NEO-6M GPS module (±5m accuracy).",
+      "ESP32 + NEO-6M GPS module with ±5m accuracy.",
+      "A Node.js backend that stores and streams continuous location updates.",
+      "A live dashboard with route history visualization.",
     ],
     metrics: [
       { value: "±5m", label: "GPS accuracy" },
-      { value: "2s", label: "map refresh" },
+      { value: "2s", label: "refresh interval" },
     ],
     links: { github: null, live: null }, // TODO
     readout: [
@@ -550,51 +673,67 @@ export const skillGroups: SkillGroup[] = [
       { name: "TypeScript", match: ["TypeScript"] },
       { name: "JavaScript (ES6+)" },
       { name: "Python", match: ["Python"] },
-      { name: "SQL", match: ["PostgreSQL", "PostgreSQL/Prisma"] },
+      { name: "SQL", match: ["PostgreSQL"] },
       { name: "C/C++" },
     ],
   },
   {
-    label: "Frontend",
+    label: "Frontend & 3D",
     skills: [
       { name: "React", match: ["React"] },
       { name: "Next.js", match: ["Next.js"] },
       { name: "React Native", match: ["React Native"] },
       { name: "Three.js / R3F", match: ["Three.js", "R3F"] },
       { name: "Tailwind CSS", match: ["Tailwind", "NativeWind"] },
+      { name: "Chrome Extensions (MV3)", match: ["Chrome MV3"] },
     ],
   },
   {
-    label: "Backend & DB",
+    label: "Backend & Databases",
     skills: [
       { name: "Node.js", match: ["Node.js"] },
       { name: "Express", match: ["Express"] },
-      { name: "PostgreSQL", match: ["PostgreSQL", "PostgreSQL/Prisma"] },
-      { name: "Prisma", match: ["Prisma", "PostgreSQL/Prisma"] },
+      { name: "REST APIs", match: ["REST APIs"], projects: ["xplor", "nbadms"] },
+      { name: "PostgreSQL", match: ["PostgreSQL"] },
+      { name: "Prisma", match: ["Prisma"] },
       { name: "MongoDB", match: ["MongoDB"] },
-      { name: "Firebase", match: ["Firebase", "Firebase Auth", "Firestore"] },
+      { name: "Firebase / Firestore", match: ["Firebase", "Firebase Auth", "Firestore"] },
+      { name: "Cloud Functions", match: ["Cloud Functions"] },
+    ],
+  },
+  {
+    label: "AI & Data",
+    skills: [
+      { name: "LLMs", match: ["LLMs"] },
+      { name: "RAG", match: ["RAG"] },
+      { name: "ChromaDB", match: ["ChromaDB"] },
+      { name: "Groq", match: ["Groq"] },
+      { name: "Power BI" },
+      { name: "Tableau" },
+      { name: "Excel" },
     ],
   },
   {
     label: "Security & Networking",
     skills: [
-      { name: "RBAC", projects: ["nbadms", "technofluid"] },
-      { name: "JWT", projects: ["nbadms", "api-inspector"] },
-      { name: "TCP/IP", match: ["sockets"] },
+      { name: "RBAC", projects: ["nbadms", "technofluid", "carbonguard"] },
+      { name: "JWT", match: ["JWT"], projects: ["api-inspector", "carbonguard"] },
+      { name: "HMAC auth", projects: ["carbonguard"] },
+      { name: "TCP/IP", match: ["TCP/IP"] },
       { name: "Socket programming", match: ["sockets"] },
       { name: "Wireshark" },
     ],
   },
   {
-    label: "Tools",
+    label: "Blockchain",
     skills: [
-      { name: "Git" },
-      { name: "GitHub" },
-      { name: "Linux" },
-      { name: "VS Code" },
-      { name: "Figma" },
-      { name: "VirtualBox" },
+      { name: "Solidity", match: ["Solidity"] },
+      { name: "Ethereum (Sepolia)", match: ["Ethereum Sepolia"] },
     ],
+  },
+  {
+    label: "Tools",
+    skills: [{ name: "Git" }, { name: "GitHub" }, { name: "Linux" }, { name: "VS Code" }, { name: "Figma" }, { name: "VirtualBox" }],
   },
   {
     label: "Embedded & IoT",
@@ -604,6 +743,7 @@ export const skillGroups: SkillGroup[] = [
       { name: "RFID", match: ["RFID"] },
       { name: "NEO-6M GPS", match: ["NEO-6M GPS"] },
       { name: "Blynk IoT", match: ["Blynk"] },
+      { name: "Modbus", match: ["Modbus"] },
       { name: "Current/voltage sensing", match: ["SCT013", "ZMPT101B"] },
     ],
   },
@@ -612,6 +752,7 @@ export const skillGroups: SkillGroup[] = [
 export const skillLabels = {
   graphTitle: "Skill ↔ project graph",
   graphHint: "Hover or focus a node to trace its connections.",
+  legendSkill: "Skill",
 };
 
 // ---------------------------------------------------------------------------
@@ -621,23 +762,28 @@ export const skillLabels = {
 export const achievements: Achievement[] = [
   {
     kind: "Patent",
-    title: "IoT-enabled Railway Seat Verification System",
-    detail: "Indian patent application No. 202511086732 A (published).",
+    title: "Indian Patent Application Published",
+    detail: "No. 202511086732 A — IoT-enabled Railway Seat Verification System.",
+  },
+  {
+    kind: "Research",
+    title: "CarbonGuard Manuscript",
+    detail: "Co-authored a manuscript on the carbon credit platform, submitted to an IEEE conference.",
   },
   {
     kind: "Academics",
-    title: "Ranked 2nd in Electrical & Computer Engineering",
-    detail: "Thapar Institute of Engineering and Technology — certificate + cash prize.",
+    title: "Rank #2 — EEC Branch, TIET",
+    detail: "Awarded a certificate and cash prize for academic performance.",
   },
   {
     kind: "Scholarship",
-    title: "Merit-based scholarship",
-    detail: "Awarded for academic performance at TIET.",
+    title: "Merit-Based Scholarship",
+    detail: "Awarded by Thapar Institute for academic performance.",
   },
   {
     kind: "DSA",
-    title: "250+ problems on LeetCode",
-    detail: "Consistent practice in data structures and algorithms.",
+    title: "250+ LeetCode Problems",
+    detail: "Consistent data structures and algorithms practice.",
   },
 ];
 

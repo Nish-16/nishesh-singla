@@ -9,7 +9,7 @@ import Chip from "@/components/ui/Chip";
 import { useReducedMotion } from "@/lib/hooks";
 
 export default function Experience() {
-  const { experience } = useSiteContent();
+  const experience = useSiteContent().experience.filter((r) => r.kind !== "leadership");
   const [open, setOpen] = useState<number | null>(0);
   const reduced = useReducedMotion();
 
@@ -44,8 +44,8 @@ export default function Experience() {
                       </span>
                       <span className="mt-1 block font-mono text-xs text-muted">
                         {role.period} · {role.location}
-                        {role.kind === "leadership" && <span className="ml-2 text-second">[{experienceLabels.leadership}]</span>}
                       </span>
+                      {role.summary && <span className="mt-2 block max-w-2xl text-sm text-ink/80">{role.summary}</span>}
                     </span>
                     <span className="label-mono flex shrink-0 items-center gap-2 text-[11px] text-muted">
                       {isOpen ? experienceLabels.collapse : experienceLabels.expand}

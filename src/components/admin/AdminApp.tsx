@@ -64,10 +64,10 @@ export default function AdminApp() {
 
 const TABS: { id: TabId; label: string; icon: IconName; title: string; description: string }[] = [
   { id: "profile", label: "Profile", icon: "user", title: "Profile & About", description: "Your name, tagline, bio, stats and links." },
-  { id: "experience", label: "Experience", icon: "briefcase", title: "Experience", description: "Roles on the timeline, newest first." },
+  { id: "experience", label: "Experience", icon: "briefcase", title: "Experience & leadership", description: "Work roles on the timeline, plus leadership roles (set Type to Leadership)." },
   { id: "projects", label: "Projects", icon: "folder", title: "Projects", description: "Cards in the projects grid. Featured ones show larger." },
   { id: "skills", label: "Skills", icon: "layers", title: "Skills", description: "Skill groups and what links them to projects in the graph." },
-  { id: "achievements", label: "Achievements", icon: "award", title: "Research & achievements", description: "Patents, rankings and awards." },
+  { id: "achievements", label: "Achievements", icon: "award", title: "Research & achievements", description: "Patents, papers, rankings and awards." },
   { id: "intros", label: "Section intros", icon: "text", title: "Section intros", description: "The large line under each section heading." },
   { id: "json", label: "JSON & backups", icon: "braces", title: "JSON & backups", description: "Edit everything as JSON, download a copy, or restore a previous version." },
   { id: "messages", label: "Messages", icon: "inbox", title: "Messages", description: "Submissions from the contact form." },
