@@ -85,9 +85,19 @@ export interface Stat {
 // Identity & site
 // ---------------------------------------------------------------------------
 
+/** NEXT_PUBLIC_SITE_URL → Vercel's production domain → fallback. Empty values are ignored; https:// is added if missing. */
+function resolveSiteUrl(): string {
+  const raw =
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+    process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim() ||
+    "nishesh-singla.vercel.app";
+  const url = /^https?:\/\//.test(raw) ? raw : `https://${raw}`;
+  return url.replace(/\/+$/, "");
+}
+
 export const site = {
-  // TODO: replace with the real deployed URL (used for sitemap + Open Graph).
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://nishesh-singla.vercel.app",
+  // Used for sitemap, canonical URL and Open Graph. Set NEXT_PUBLIC_SITE_URL once you have a custom domain.
+  url: resolveSiteUrl(),
   name: "Nishesh Singla",
   title: "Nishesh Singla — Full-stack Developer",
   description:
