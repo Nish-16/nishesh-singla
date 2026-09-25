@@ -1,4 +1,4 @@
-import { projects, skillGroups, type Project } from "@/content";
+import type { Project, SkillGroup } from "@/content";
 
 export type GraphNode = {
   id: string;
@@ -15,7 +15,7 @@ export const GRAPH_W = 960;
 export const GRAPH_H = 700;
 
 /** Which projects use a skill, derived from project stacks (+ explicit extras in content). */
-export function projectsForSkill(skill: { match?: string[]; projects?: string[] }): string[] {
+export function projectsForSkill(skill: { match?: string[]; projects?: string[] }, projects: Project[]): string[] {
   const set = new Set(skill.projects ?? []);
   if (skill.match) {
     for (const p of projects) if (p.stack.some((t) => skill.match!.includes(t))) set.add(p.slug);
@@ -26,14 +26,14 @@ export function projectsForSkill(skill: { match?: string[]; projects?: string[] 
 const shortTitle = (t: string) => t.split(" — ")[0].replace(/ System$/, "").replace(/ Platform$/, "");
 
 /** Deterministic force layout computed once (no animation loop needed). */
-export function buildSkillGraph(): { nodes: GraphNode[]; links: GraphLink[] } {
+export function buildSkillGraph(projects: Project[], skillGroups: SkillGroup[]): { nodes: GraphNode[]; links: GraphLink[] } {
   const links: GraphLink[] = [];
   const skillNodes: GraphNode[] = [];
   const seen = new Set<string>();
 
   for (const g of skillGroups) {
     for (const s of g.skills) {
-      const ps = projectsForSkill(s);
+      const ps = projectsForSkill(s, projects);
       if (!ps.length || seen.has(s.name)) continue;
       seen.add(s.name);
       const id = `s:${s.name}`;

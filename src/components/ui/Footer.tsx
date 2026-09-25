@@ -1,6 +1,10 @@
-import { contact, footer, identity, sections } from "@/content";
+"use client";
+
+import { contact, footer, sections } from "@/content";
+import { useSiteContent } from "@/components/SiteContentProvider";
 
 export default function Footer() {
+  const { identity } = useSiteContent();
   return (
     <footer className="mx-auto max-w-6xl px-4 pb-10 sm:px-6 md:pl-20">
       <div className="flex flex-col gap-4 border-t border-line pt-6 font-mono text-xs text-muted md:flex-row md:items-center md:justify-between">

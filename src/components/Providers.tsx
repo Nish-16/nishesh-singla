@@ -4,16 +4,18 @@ import type { ReactNode } from "react";
 import SmoothScroll from "./ui/SmoothScroll";
 import ScrollRail from "./ui/ScrollRail";
 import { TerminalProvider } from "./ui/Terminal";
-import { ThemeProvider } from "./ThemeProvider";
+import { SiteContentProvider } from "./SiteContentProvider";
+import type { SiteContent } from "@/lib/siteContent";
 
-export default function Providers({ children }: { children: ReactNode }) {
+/** Client providers for the public site (the root layout supplies ThemeProvider). */
+export default function Providers({ content, children }: { content: SiteContent; children: ReactNode }) {
   return (
-    <ThemeProvider>
+    <SiteContentProvider content={content}>
       <TerminalProvider>
         <SmoothScroll />
         <ScrollRail />
         {children}
       </TerminalProvider>
-    </ThemeProvider>
+    </SiteContentProvider>
   );
 }

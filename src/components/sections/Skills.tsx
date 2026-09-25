@@ -1,12 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { projectCategories, skillGroups, skillLabels } from "@/content";
+import { projectCategories, skillLabels } from "@/content";
+import { useSiteContent } from "@/components/SiteContentProvider";
 import { buildSkillGraph, GRAPH_H, GRAPH_W } from "@/lib/skillGraph";
 import SectionHeading from "@/components/ui/SectionHeading";
 
 export default function Skills() {
-  const graph = useMemo(() => buildSkillGraph(), []);
+  const { projects, skillGroups } = useSiteContent();
+  const graph = useMemo(() => buildSkillGraph(projects, skillGroups), [projects, skillGroups]);
   const [focus, setFocus] = useState<string | null>(null);
 
   const neighbours = useMemo(() => {

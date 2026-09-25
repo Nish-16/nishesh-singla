@@ -1,8 +1,12 @@
-import { sectionIntros, sections, type SectionId } from "@/content";
+"use client";
+
+import { sections, type SectionId } from "@/content";
+import { useSiteContent } from "@/components/SiteContentProvider";
 import ScrambleText from "./ScrambleText";
 
 /** Code-style section label, e.g. `~/projects`. */
 export default function SectionHeading({ id }: { id: SectionId }) {
+  const { sectionIntros } = useSiteContent();
   const s = sections.find((x) => x.id === id)!;
   return (
     <header className="mb-10 md:mb-14">

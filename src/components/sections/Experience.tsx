@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { experience, experienceLabels } from "@/content";
+import { experienceLabels } from "@/content";
+import { useSiteContent } from "@/components/SiteContentProvider";
 import SectionHeading from "@/components/ui/SectionHeading";
 import Chip from "@/components/ui/Chip";
 import { useReducedMotion } from "@/lib/hooks";
 
 export default function Experience() {
+  const { experience } = useSiteContent();
   const [open, setOpen] = useState<number | null>(0);
   const reduced = useReducedMotion();
 

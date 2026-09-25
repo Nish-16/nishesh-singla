@@ -1,7 +1,10 @@
-import { achievements } from "@/content";
+"use client";
+
+import { useSiteContent } from "@/components/SiteContentProvider";
 import SectionHeading from "@/components/ui/SectionHeading";
 
 export default function Research() {
+  const { achievements } = useSiteContent();
   return (
     <section id="research" aria-labelledby="research-title" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-24 sm:px-6 md:py-32 md:pl-20">
       <SectionHeading id="research" />

@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import dynamic from "next/dynamic";
-import { hero, identity } from "@/content";
+import { hero as heroLabels } from "@/content";
+import { useSiteContent } from "@/components/SiteContentProvider";
 import { useInView, useIsMobile, useMounted, useReducedMotion, webglAvailable } from "@/lib/hooks";
 import { useTheme } from "@/components/ThemeProvider";
 import TrafficChart from "./TrafficChart";
@@ -11,6 +12,7 @@ const HeroScene = dynamic(() => import("@/components/three/HeroScene"), { ssr: f
 const HeroFallback = dynamic(() => import("@/components/three/HeroFallback"), { ssr: false });
 
 export default function Hero() {
+  const { identity, hero } = useSiteContent();
   const mounted = useMounted();
   const reduced = useReducedMotion();
   const mobile = useIsMobile();
@@ -64,7 +66,7 @@ export default function Hero() {
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 md:h-20">
         <TrafficChart />
         <p aria-hidden className="label-mono absolute bottom-2 right-4 text-[10px] text-muted">
-          {hero.scrollHint} ↓
+          {heroLabels.scrollHint} ↓
         </p>
       </div>
     </section>

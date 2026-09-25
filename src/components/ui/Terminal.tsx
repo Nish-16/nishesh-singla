@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { identity, projectCategories, projects, sections, site, skillGroups, terminal } from "@/content";
+import { projectCategories, sections, site, terminal } from "@/content";
+import { useSiteContent } from "@/components/SiteContentProvider";
 import { scrollToTarget } from "@/lib/scroll";
 import { useTheme } from "@/components/ThemeProvider";
 import { useReducedMotion } from "@/lib/hooks";
@@ -28,6 +29,7 @@ export function Terminal({ autoFocus = false, onExit, className = "" }: { autoFo
   const reduced = useReducedMotion();
   const inputId = useId();
   const { theme, toggleTheme } = useTheme();
+  const { identity, projects, skillGroups } = useSiteContent();
 
   useEffect(() => {
     if (autoFocus) inputRef.current?.focus();
@@ -147,7 +149,7 @@ export function Terminal({ autoFocus = false, onExit, className = "" }: { autoFo
           print(line("err", terminal.notFound(name)));
       }
     },
-    [print, runScan, onExit, theme, toggleTheme],
+    [print, runScan, onExit, theme, toggleTheme, identity, projects, skillGroups],
   );
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

@@ -33,12 +33,27 @@ Other scripts: `npm run build`, `npm start`, `npm run lint`.
 1. **Resume:** put your PDF at `public/resume.pdf` (the "Download Resume" button and `resume` terminal command point there).
 2. **Site URL:** set `NEXT_PUBLIC_SITE_URL` (used by the sitemap, canonical URL, and Open Graph).
 3. **Contact form (Firebase):**
-   - Create a Firebase project → add a **Web app** → copy its config into the `NEXT_PUBLIC_FIREBASE_*` vars.
+   - Create a Firebase project → add a **Web app** → copy its config into the `NEXT_PUBLIC_FIREBASE_*` vars, plus `NEXT_PUBLIC_ADMIN_EMAIL`.
    - Enable **Cloud Firestore**.
    - Deploy the rules in [`firestore.rules`](firestore.rules) (Firestore → Rules, or `firebase deploy --only firestore:rules`). They allow *create-only* writes of validated messages to `messages/` and block all client reads.
    - Messages appear in the `messages` collection. For email notifications, add the "Trigger Email from Firestore" extension or a Cloud Function.
    - Without the env vars the form is disabled and asks visitors to email you directly.
 4. Fill in the project GitHub/live links in `content.ts`.
+
+## Admin (`/admin`)
+
+A hidden dashboard (not linked anywhere, `noindex`) for editing the site without touching code: profile/about, experience, projects, skills, achievements, section intros, raw JSON (import/export), backups, and contact-form messages.
+
+- **Storage:** all editable content is one Firestore document, `site/content` (field `data` = JSON). `src/content.ts` is the default/fallback — if the document is missing or unreadable, the site renders from code.
+- **Publishing:** saving writes the document, keeps the previous version in `site_history`, then calls `/api/revalidate` (verifies your Firebase ID token) so the public page updates immediately.
+- **Security:** only `NEXT_PUBLIC_ADMIN_EMAIL` can write — enforced by `firestore.rules` and the revalidate route, not by the URL being secret.
+
+**One-time setup (Firebase console):**
+1. **Authentication → Sign-in method →** enable **Email/Password**.
+2. **Authentication → Users → Add user** with your admin email and a strong password.
+3. **Authentication → Settings → User actions →** uncheck **Enable create (sign-up)** so nobody else can register accounts.
+4. **Firestore Database →** create it, then **Rules →** paste `firestore.rules` → **Publish**.
+5. Open `/admin`, sign in, click **Publish to Firestore** once to copy the current content into Firestore. After that, edit and **Save changes**.
 
 ## Deploy (Vercel)
 

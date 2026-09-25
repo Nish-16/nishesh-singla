@@ -1,8 +1,12 @@
-import { about, identity } from "@/content";
+"use client";
+
+import { about as aboutLabels } from "@/content";
+import { useSiteContent } from "@/components/SiteContentProvider";
 import SectionHeading from "@/components/ui/SectionHeading";
 import CountUp from "@/components/ui/CountUp";
 
 export default function About() {
+  const { about, identity } = useSiteContent();
   return (
     <section id="about" aria-labelledby="about-title" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-24 sm:px-6 md:py-32 md:pl-20">
       <SectionHeading id="about" />
@@ -14,12 +18,12 @@ export default function About() {
         </div>
 
         {/* profile.json card */}
-        <aside aria-label={about.profileFile} className="overflow-hidden rounded-xl border border-line bg-surface font-mono text-sm">
+        <aside aria-label={aboutLabels.profileFile} className="overflow-hidden rounded-xl border border-line bg-surface font-mono text-sm">
           <div className="flex items-center gap-2 border-b border-line bg-surface-2/60 px-4 py-2.5">
             <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-second/80" />
             <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-muted/50" />
             <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-accent/80" />
-            <span className="ml-2 text-xs text-muted">{about.profileFile}</span>
+            <span className="ml-2 text-xs text-muted">{aboutLabels.profileFile}</span>
           </div>
           <div className="px-5 py-4 leading-7">
             <span aria-hidden className="text-muted">{"{"}</span>

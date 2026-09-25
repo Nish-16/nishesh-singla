@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { contact, identity } from "@/content";
+import { contact } from "@/content";
+import { useSiteContent } from "@/components/SiteContentProvider";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { firebaseConfigured, sendContactMessage } from "@/lib/firebase";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
 export default function Contact() {
+  const { identity } = useSiteContent();
   const [copied, setCopied] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
 

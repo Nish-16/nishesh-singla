@@ -72,6 +72,12 @@ export interface SkillGroup {
   skills: Skill[];
 }
 
+export interface Achievement {
+  kind: string;
+  title: string;
+  detail: string;
+}
+
 export interface Stat {
   key: string;
   value: number;
@@ -612,7 +618,7 @@ export const skillLabels = {
 // Research & achievements
 // ---------------------------------------------------------------------------
 
-export const achievements = [
+export const achievements: Achievement[] = [
   {
     kind: "Patent",
     title: "IoT-enabled Railway Seat Verification System",

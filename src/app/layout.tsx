@@ -1,9 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
-import { identity, nav, site } from "@/content";
-import Providers from "@/components/Providers";
-import Header from "@/components/ui/Header";
-import Footer from "@/components/ui/Footer";
+import { identity, site } from "@/content";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { PALETTES, themeInitScript } from "@/lib/theme";
 import "./globals.css";
 
@@ -76,17 +74,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="min-h-screen">
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded focus:bg-accent focus:px-4 focus:py-2 focus:font-mono focus:text-on-accent"
-        >
-          {nav.skip}
-        </a>
-        <Providers>
-          <Header />
-          <main id="main">{children}</main>
-          <Footer />
-        </Providers>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

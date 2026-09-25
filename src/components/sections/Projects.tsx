@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
-import { projectCategories, projectLabels, projects, type Project, type ProjectCategory } from "@/content";
+import { projectCategories, projectLabels, type Project, type ProjectCategory } from "@/content";
+import { useSiteContent } from "@/components/SiteContentProvider";
 import SectionHeading from "@/components/ui/SectionHeading";
 import Chip from "@/components/ui/Chip";
 import Modal from "@/components/ui/Modal";
@@ -19,7 +20,7 @@ const XplorRoom = dynamic(() => import("@/components/three/XplorRoom"), {
 type Filter = "all" | ProjectCategory;
 const HASH_PREFIX = "#project-";
 
-function slugFromHash(): string | null {
+function slugFromHash(projects: Project[]): string | null {
   if (typeof window === "undefined") return null;
   const h = window.location.hash;
   if (!h.startsWith(HASH_PREFIX)) return null;
@@ -28,26 +29,27 @@ function slugFromHash(): string | null {
 }
 
 export default function Projects() {
+  const { projects } = useSiteContent();
   const [filter, setFilter] = useState<Filter>("all");
   // Deep link: /#project-<slug> opens that project's modal.
-  const [openSlug, setOpenSlug] = useState<string | null>(() => slugFromHash());
+  const [openSlug, setOpenSlug] = useState<string | null>(() => slugFromHash(projects));
   const reduced = useReducedMotion();
 
   useEffect(() => {
     const onHash = () => {
-      const slug = slugFromHash();
+      const slug = slugFromHash(projects);
       if (slug) setOpenSlug(slug);
     };
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
-  }, []);
+  }, [projects]);
 
   const close = () => {
     setOpenSlug(null);
     if (window.location.hash.startsWith(HASH_PREFIX)) history.replaceState(null, "", window.location.pathname);
   };
 
-  const visible = useMemo(() => (filter === "all" ? projects : projects.filter((p) => p.category === filter)), [filter]);
+  const visible = useMemo(() => (filter === "all" ? projects : projects.filter((p) => p.category === filter)), [filter, projects]);
   const openProject = projects.find((p) => p.slug === openSlug) ?? null;
 
   const filters: { id: Filter; label: string; count: number }[] = [

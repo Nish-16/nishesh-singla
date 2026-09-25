@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { identity, nav, sections } from "@/content";
+import { nav, sections } from "@/content";
+import { useSiteContent } from "@/components/SiteContentProvider";
 import { useTerminal } from "./Terminal";
 import ThemeToggle from "./ThemeToggle";
 import { useReducedMotion } from "@/lib/hooks";
@@ -11,6 +12,7 @@ const NAV = sections.filter((s) => s.nav);
 
 export default function Header() {
   const { toggle } = useTerminal();
+  const { identity } = useSiteContent();
   const reduced = useReducedMotion();
   const [active, setActive] = useState<string | null>(null);
 
